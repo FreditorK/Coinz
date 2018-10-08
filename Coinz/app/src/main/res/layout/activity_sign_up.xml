@@ -46,6 +46,16 @@
                 android:inputType="textPassword"
                 android:paddingBottom="15dp"
                 android:textColorHint="@color/colorAccent"/>
+            <EditText
+                android:id="@+id/repeat_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:hint="confirm password"
+                android:textAlignment="center"
+                android:inputType="textPassword"
+                android:paddingBottom="15dp"
+                android:textColorHint="@color/colorAccent"/>
             <Button
                 android:id="@+id/sign_up_button"
                 android:layout_width="match_parent"

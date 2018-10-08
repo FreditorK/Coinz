@@ -2,5 +2,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-
+    <RelativeLayout
+        android:layout_margin="1dp"
+        android:layout_width="match_parent"
+        android:layout_height="82dp"
+        android:background="@color/colorPrimary">
+        <ImageView
+            android:id="@+id/profile_pic"
+            android:layout_width="82dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="5dp"
+            android:background="@color/whiteTransparent"/>
+        <TextView
+            android:id="@+id/text_view_prof"
+            android:layout_margin="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tap on picture to change it"
+            android:layout_toRightOf="@+id/profile_pic"/>
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="save"
+            android:layout_toRightOf="@id/profile_pic"
+            android:layout_below="@id/text_view_prof"
+            android:layout_margin="5dp"/>
+    </RelativeLayout>
 </LinearLayout>

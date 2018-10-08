@@ -11,6 +11,22 @@
         android:gravity="center"
         app:elevation="0dp"
         android:id="@+id/appbar_id">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/display_basic_prof"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"/>
+            <ImageView
+                android:id="@+id/display_profile_pic"
+                android:layout_width="82dp"
+                android:layout_height="82dp"
+                android:layout_gravity="left"
+                android:layout_marginLeft="5dp"/>
+        </LinearLayout>
     </android.support.design.widget.AppBarLayout>
 
     <android.support.design.widget.TabLayout
