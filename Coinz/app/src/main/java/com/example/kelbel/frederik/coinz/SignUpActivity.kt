@@ -21,6 +21,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener{
     var progressBar : ProgressBar? = null
     var edit_username : EditText? = null
     var edit_password : EditText? = null
+    var repeat_password : EditText? = null
 
     private var firebaseAuth : FirebaseAuth? = null
 
@@ -29,6 +30,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener{
         setContentView(R.layout.activity_sign_up)
         edit_username = findViewById(R.id.edit_username)
         edit_password = findViewById(R.id.edit_password)
+        repeat_password = findViewById(R.id.repeat_password)
         progressBar = findViewById(R.id.progress_bar)
 
         firebaseAuth = FirebaseAuth.getInstance()
@@ -40,6 +42,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener{
     private fun register(){
         val username : String = edit_username?.text.toString().trim() + "@useless.com"
         val password : String = edit_password?.text.toString().trim()
+        val rpassword : String = repeat_password?.text.toString().trim()
 
         if (username.isEmpty()){
             edit_username?.error = "Please enter a username"
@@ -48,6 +51,11 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener{
         }
         if (password.length < 5){
             edit_password?.error = "Password is to short"
+            edit_password?.requestFocus()
+            return
+        }
+        if (password != rpassword){
+            edit_password?.error = "Password does not match password confirmation"
             edit_password?.requestFocus()
             return
         }
