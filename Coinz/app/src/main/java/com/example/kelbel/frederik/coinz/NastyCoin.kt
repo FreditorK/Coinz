@@ -1,12 +1,9 @@
 package com.example.kelbel.frederik.coinz
 
-import java.util.*
-import kotlin.collections.ArrayList
-
 data class NastyCoin (
+        var id: String,
         var value: Float,
         var currency: String,
-        var marker_symbol: Int,
-        var marker_color: String,
+        var marker_symbol: String,
         var coordinates: Pair<Float, Float>
 )
