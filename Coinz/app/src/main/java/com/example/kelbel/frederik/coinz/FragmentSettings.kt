@@ -126,9 +126,9 @@ class FragmentSettings : Fragment() {
         val user = firebaseAuth?.getCurrentUser()
 
         if (user != null) {
-            if (user!!.photoUrl != null) {
+            if (user.photoUrl != null) {
                 Glide.with(this)
-                        .load(user!!.photoUrl.toString())
+                        .load(user.photoUrl.toString())
                         .into(profile_pic)
             }
         }

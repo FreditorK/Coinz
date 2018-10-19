@@ -54,8 +54,10 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.5.2'
     implementation 'org.apache.directory.studio:org.apache.commons.io:2.4'
 
-    //Circular Menu
-    implementation 'com.oguzdev:CircularFloatingActionMenu:1.0.2'
+    //For storing objects ==> Object to gson conversion
+    implementation 'com.google.code.gson:gson:2.8.5'
+    //Library for graph plotting
+    implementation 'com.diogobernardino:williamchart:2.5.0'
 
 }
 

@@ -5,4 +5,14 @@
     <color name="colorAccent">#D81B60</color>
     <color name="white">#ffffff</color>
     <color name="whiteTransparent">#80ffffff</color>
+    <color name="grey">#E0E0E0</color>
+    <color name="coinGreen">#4C7B56</color>
+    <color name="coinYellow">#B3AB3B</color>
+    <color name="coinRed">#7B4747</color>
+    <color name="coinBlue">#4C547B</color>
+
+    <color name="coinGreenAccent">#5E8C67</color>
+    <color name="coinYellowAccent">#C4BC4C</color>
+    <color name="coinRedAccent">#8C5858</color>
+    <color name="coinBlueAccent">#5D658C</color>
 </resources>

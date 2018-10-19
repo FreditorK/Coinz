@@ -1,6 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="3dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:orientation="vertical"
+            android:padding="2dp">
+
+            <com.db.chart.view.LineChartView
+                android:id="@+id/shil_graph"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:background="@color/grey"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:padding="1dp"
+                android:background="@color/coinGreen">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="SHIL: 0"
+                    android:textSize="32dp"
+                    android:id="@+id/shil_text"/>
+
+                <Button
+                    android:id="@+id/shil_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:padding="1dp"
+                    android:text="Exchange"
+                    android:background="@color/coinGreenAccent"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:orientation="vertical"
+            android:padding="2dp">
+
+            <com.db.chart.view.LineChartView
+                android:id="@+id/dolr_graph"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:background="@color/grey"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/coinBlue">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:padding="1dp"
+                    android:text="DOLR: 0"
+                    android:textSize="32dp"
+                    android:id="@+id/dolr_text"/>
+
+                <Button
+                    android:id="@+id/dolr_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:padding="1dp"
+                    android:text="Exchange"
+                    android:background="@color/coinBlueAccent"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:orientation="vertical"
+            android:padding="2dp">
+
+            <com.db.chart.view.LineChartView
+                android:id="@+id/quid_graph"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:background="@color/grey"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/coinYellow">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:padding="1dp"
+                    android:text="QUID: 0"
+                    android:textSize="32dp"
+                    android:id="@+id/quid_text"/>
+
+                <Button
+                    android:id="@+id/quid_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:padding="1dp"
+                    android:text="Exchange"
+                    android:background="@color/coinYellowAccent"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:orientation="vertical"
+            android:padding="2dp">
+
+            <com.db.chart.view.LineChartView
+                android:id="@+id/peny_graph"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:background="@color/grey"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:padding="1dp"
+                android:background="@color/coinRed">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="PENY: 0"
+                    android:textSize="32dp"
+                    android:id="@+id/peny_text"/>
+
+                <Button
+                    android:id="@+id/peny_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:padding="1dp"
+                    android:text="Exchange"
+                    android:background="@color/coinRedAccent"/>
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

@@ -20,22 +20,25 @@ import java.util.*
 
 class FragmentDepot : Fragment() {
 
-    private var v : View? = null
-
     private var tabLayout : TabLayout? = null
     private var basic_prof : TextView? = null
     private var profile_pic: ImageView? = null
     private var viewPager : ViewPager? = null
+    private var gold_text : TextView? = null
 
     private var firebaseAuth : FirebaseAuth? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        v = inflater.inflate(R.layout.fragment_depot, container, false)
-        tabLayout = v?.findViewById(R.id.tabLayout_id)
-        basic_prof = v?.findViewById(R.id.display_basic_prof)
-        viewPager = v?.findViewById(R.id.viewpager_id)
-        profile_pic = v?.findViewById(R.id.display_profile_pic)
-        val adapter : Pager = Pager(this.activity?.supportFragmentManager)
+        return inflater.inflate(R.layout.fragment_depot, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        tabLayout = view.findViewById(R.id.tabLayout_id)
+        basic_prof = view.findViewById(R.id.display_basic_prof)
+        viewPager = view.findViewById(R.id.viewpager_id)
+        profile_pic = view.findViewById(R.id.display_profile_pic)
+        gold_text = view.findViewById(R.id.gold_display)
+        val adapter = Pager(this.activity?.supportFragmentManager)
 
         firebaseAuth = FirebaseAuth.getInstance()
 
@@ -48,19 +51,23 @@ class FragmentDepot : Fragment() {
         tabLayout?.setupWithViewPager(viewPager)
 
         loadInformation()
-
-        return v
     }
 
     private fun loadInformation() {
         val user = firebaseAuth?.getCurrentUser()
         if (user != null) {
-            basic_prof?.text = "Logged in as: " + user.email?.substringBefore('@')
+            basic_prof?.text = user.email?.substringBefore('@')
+            gold_text?.text = ProfileActivity.gold.toString()
             if (user.photoUrl != null) {
                 Glide.with(this)
                         .load(user.photoUrl.toString())
                         .into(profile_pic)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        gold_text?.text = ProfileActivity.gold.toString()
     }
 }

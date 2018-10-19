@@ -1,15 +1,15 @@
 package com.example.kelbel.frederik.coinz
 
-import android.content.Context
+import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.content.res.ResourcesCompat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -30,156 +30,104 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
-import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton
-import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu
-import com.oguzdev.circularfloatingactionmenu.library.SubActionButton
-import org.apache.commons.io.IOUtils
-import org.json.JSONArray
-import org.json.JSONObject
-import java.io.InputStream
-import java.io.StringWriter
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
-
 
 class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
 
     private lateinit var v : View
     private lateinit  var mapView: MapView
-    private lateinit var map : MapboxMap
-    private lateinit var originLocation : Location
-    private lateinit var permissionsManager: PermissionsManager
-    private lateinit var actionButton : FloatingActionButton
-    private lateinit var button1 : SubActionButton
-    private lateinit var button2 : SubActionButton
-    private lateinit var button3 : SubActionButton
-    private lateinit var button4 : SubActionButton
 
+    private lateinit var map : MapboxMap
+    //private lateinit var originLocation : Location
+    private lateinit var permissionsManager: PermissionsManager
     private var locationEngine: LocationEngine? = null
     private var locationLayerPlugin : LocationLayerPlugin? = null
 
     private val t = "FragmentMap"
-    private var currentDate : String = ""
-    private var downloadDate : String = ""
-    private val preferencesFile : String = "MyPrefsFile"
+
     private lateinit var shilview: TextView
     private lateinit var dolrview: TextView
     private lateinit var quidview: TextView
     private lateinit var penyview: TextView
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         v = inflater.inflate(R.layout.fragment_map, container, false)
+        return v
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Mapbox.getInstance(this.context!!, "pk.eyJ1IjoiZnJlZGRvaXNoZXJlIiwiYSI6ImNqbWdsNThyYjI0ODIzcWxoZG9xdDVwNGYifQ.w2TSSM7Issr2fQdrhxwsBw")
         mapView = v.findViewById(R.id.mapView)
+        mapView.onCreate(savedInstanceState)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync{mapboxMap ->
             map = mapboxMap
             map.uiSettings.isCompassEnabled = true
-            val json = JSONObject(loadGeoJson())
-            val coinExchangeRates = retrieveCoinExchangerates(json)
-            val nastycoins : ArrayList<NastyCoin> = retrieveCoins(json)
-            for (n in nastycoins) {
+            for (n in ProfileActivity.nastycoins!!) {
                 val icon : Icon = IconFactory.getInstance(activity!!.applicationContext).fromBitmap(BitmapFactory.decodeResource(resources, getFittingIconId(n)))
                 map.addMarker(MarkerOptions().setIcon(icon)
-                        .position(LatLng(n.coordinates.second.toDouble(), n.coordinates.first.toDouble()))
+                        .position(LatLng(n.coordinates.second, n.coordinates.first))
                         .title(n.id)
                         .snippet(n.value.toString()))
             }
             enableLocation()
+            shilview = view.findViewById(R.id.shil_textview)
+            dolrview = view.findViewById(R.id.dolr_textview)
+            quidview = view.findViewById(R.id.quid_textview)
+            penyview = view.findViewById(R.id.peny_textview)
+            displayWalletValues()
         }
-        currentDate = getCurrentDate()
-        setUpWalletMenu()
-
-        return v
     }
 
-    fun setUpWalletMenu(){
-
-        shilview = TextView(this.context)
-        dolrview = TextView(this.context)
-        quidview = TextView(this.context)
-        penyview = TextView(this.context)
-
-        val settings = context?.getSharedPreferences(preferencesFile, Context.MODE_PRIVATE)
-        shilview.text = settings?.getString("shil", "").toString()
-        dolrview.text = settings?.getString("dolr", "").toString()
-        quidview.text = settings?.getString("quid", "").toString()
-        penyview.text = settings?.getString("peny", "").toString()
-
-        val icon : ImageView = ImageView(this.context)
-        icon.setImageDrawable(resources.getDrawable(R.drawable.ic_account_balance_wallet))
-
-        actionButton = FloatingActionButton.Builder(this.activity)
-                .setBackgroundDrawable(R.mipmap.shil)
-                .setContentView(icon)
-                .setPosition(8)
-                .build()
-        val itemBuilder : SubActionButton.Builder = SubActionButton.Builder(this.activity)
-        button1 = itemBuilder.setContentView(shilview).setBackgroundDrawable(resources.getDrawable(R.mipmap.shil)).build()
-        button2 = itemBuilder.setContentView(dolrview).setBackgroundDrawable(resources.getDrawable(R.mipmap.dolr)).build()
-        button3 = itemBuilder.setContentView(quidview).setBackgroundDrawable(resources.getDrawable(R.mipmap.quid)).build()
-        button4 = itemBuilder.setContentView(penyview).setBackgroundDrawable(resources.getDrawable(R.mipmap.peny)).build()
-        val actionMenu : FloatingActionMenu = FloatingActionMenu.Builder(this.activity)
-                .addSubActionView(button1)
-                .addSubActionView(button2)
-                .addSubActionView(button3)
-                .addSubActionView(button4)
-                .attachTo(actionButton)
-                .setStartAngle(0)
-                .setEndAngle(90)
-                .build()
+    fun displayWalletValues(){//update displayed wallet
+        shilview.text = ProfileActivity.wallet?.shilCoins?.size.toString()
+        dolrview.text = ProfileActivity.wallet?.dolrCoins?.size.toString()
+        quidview.text = ProfileActivity.wallet?.quidCoins?.size.toString()
+        penyview.text = ProfileActivity.wallet?.penyCoins?.size.toString()
     }
 
-    fun getCurrentDate() : String {
-        val calendar : Calendar = Calendar.getInstance()
-        val mdformat = SimpleDateFormat("yyyy/MM/dd")
-        return mdformat.format(calendar.getTime()).toString()
+    fun getFittingIconId(n : NastyCoin): Int{//Get the Icon to display on the map from Coin
+        return  resources.getIdentifier(n.currency + n.marker_symbol, "mipmap", context?.packageName)
     }
 
-    fun loadGeoJson(): String {
-        val stream: InputStream = context!!.applicationContext.openFileInput("coinzmap.geojson")
-        val writer = StringWriter()
-        IOUtils.copy(stream, writer, "UTF-8")
-        return writer.toString()
+    //Coin collection
+    fun checkForCoin(location: Location){//check if a coin can be collected and collect it
+        val a = ProfileActivity.nastycoins?.indexOfFirst { i -> compareCoordinates(Pair(location.longitude, location.latitude), i.coordinates)}
+        if(a!! > -1){
+            ProfileActivity.collect(ProfileActivity.nastycoins!![a], map.markers[a].icon)
+            ProfileActivity.nastycoins?.removeAt(a)
+            map.removeMarker(map.markers[a])
+            displayWalletValues()
+        }
     }
 
-    fun setWalletVisible(){
-        button1.visibility = View.VISIBLE
-        button2.visibility = View.VISIBLE
-        button3.visibility = View.VISIBLE
-        button4.visibility = View.VISIBLE
-        actionButton.visibility = View.VISIBLE
+    fun compareCoordinates(a : Pair<Double, Double>, b : Pair<Double, Double>): Boolean {//test if given location is in range
+        if (a.first < b.first + 0.0002f && a.first > b.first - 0.0002f && a.second < b.second + 0.0002f && a.second > b.second - 0.0002f) {
+            return true
+        } else {
+            return false
+        }
     }
 
-    fun setWalletGone(){
-        button1.visibility = View.GONE
-        button2.visibility = View.GONE
-        button3.visibility = View.GONE
-        button4.visibility = View.GONE
-        actionButton.visibility = View.GONE
+    //Location, Map
+    private fun setCameraPosition(location: Location){
+        map.animateCamera(CameraUpdateFactory.newLatLng(LatLng(location.latitude, location.longitude)))
+    }
+
+    private fun enableLocation(){
+        if (PermissionsManager.areLocationPermissionsGranted(this.context)){
+            Log.d(t, "Permissions granted")
+            initLocationEngine()
+            initLocationLayer()
+        }else{
+            Log.d(t, "Permissions denied")
+            permissionsManager = PermissionsManager(this)
+            permissionsManager.requestLocationPermissions(this.activity)
+        }
     }
 
     @SuppressWarnings("MissingPermission")
     override fun onStart() {
-        setWalletVisible()
-        val settings = context?.getSharedPreferences(preferencesFile, Context.MODE_PRIVATE)
-        downloadDate = settings?.getString("lD", "").toString()
-        if (downloadDate != currentDate){
-            downloadDate = currentDate
-            DownloadFileTask(DownloadCompleteRunner, context).execute("http://homepages.inf.ed.ac.uk/stg/coinz/" + downloadDate + "/coinzmap.geojson")
-            val editor = settings?.edit()
-            shilview.text = "0"
-            dolrview.text = "0"
-            quidview.text = "0"
-            penyview.text = "0"
-            editor?.putString("shil", "0")
-            editor?.putString("dolr", "0")
-            editor?.putString("quid", "0")
-            editor?.putString("peny", "0")
-            editor?.apply()
-        }
         super.onStart()
         if(PermissionsManager.areLocationPermissionsGranted(this.context)){
             locationEngine?.requestLocationUpdates()
@@ -199,14 +147,8 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
     }
 
     override fun onStop() {
-        setWalletGone()
-        val settings = context?.getSharedPreferences(preferencesFile, Context.MODE_PRIVATE)
-        val editor = settings?.edit()
-        editor?.putString("lD", downloadDate)
-        editor?.apply()
         locationEngine?.removeLocationUpdates()
         locationLayerPlugin?.onStop()
-        actionButton.visibility = View.GONE
         super.onStop()
         mapView.onStop()
     }
@@ -216,32 +158,15 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
         mapView.onLowMemory()
     }
 
-    override fun onDestroy() {
-        locationEngine?.deactivate()
-        val settings = context?.getSharedPreferences(preferencesFile, Context.MODE_PRIVATE)
-        val editor = settings?.edit()
-        editor?.putString("shil", shilview.text.toString())
-        editor?.putString("dolr", dolrview.text.toString())
-        editor?.putString("quid", quidview.text.toString())
-        editor?.putString("peny", shilview.text.toString())
-        editor?.apply()
-        super.onDestroy()
-        mapView.onDestroy()
-    }
-
     override fun onDestroyView() {
-        mapView.onDestroy()
         super.onDestroyView()
+        mapView.onDestroy()
+        locationEngine?.deactivate()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         mapView.onSaveInstanceState(outState)
-    }
-
-    fun getFittingIconId(n : NastyCoin): Int{
-        val name: String = n.currency.toLowerCase() + n.marker_symbol
-        return  resources.getIdentifier(name , "mipmap", context?.packageName)
     }
 
     @SuppressWarnings("MissingPermission")
@@ -256,8 +181,9 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
 
     override fun onLocationChanged(location: Location?) {
         location?.let{
-            originLocation = location
+            //originLocation = location
             setCameraPosition(location)
+            checkForCoin(location)
         }
     }
 
@@ -271,23 +197,8 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)//bug
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
-    private fun enableLocation(){
-        if (PermissionsManager.areLocationPermissionsGranted(this.context)){
-            Log.d(t, "Permissions granted")
-            initLocationEngine()
-            initLocationLayer()
-        }else{
-            Log.d(t, "Permissions denied")
-            permissionsManager = PermissionsManager(this)
-            permissionsManager.requestLocationPermissions(this.activity)
-        }
-    }
-
-    private fun setCameraPosition(location: Location){
-        map.animateCamera(CameraUpdateFactory.newLatLng(LatLng(location.latitude, location.longitude)))
     }
 
     @SuppressWarnings("MissingPermission")
@@ -301,7 +212,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
         }
         val lastLocation = locationEngine?.lastLocation
         if(lastLocation != null){
-            originLocation = lastLocation
+            //originLocation = lastLocation
             setCameraPosition(lastLocation)
         }else{
             locationEngine?.addLocationEngineListener(this)
@@ -316,39 +227,5 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
             cameraMode = CameraMode.TRACKING
             renderMode = RenderMode.NORMAL
         }
-    }
-
-    fun retrieveCoinExchangerates(json : JSONObject) : CoinExchangeRates{
-        val values : CoinExchangeRates = CoinExchangeRates(0f, 0f, 0f, 0f)
-        values.SHIL = json.getJSONObject("rates").getString("SHIL").toFloat()
-        values.DOLR = json.getJSONObject("rates").getString("DOLR").toFloat()
-        values.QUID = json.getJSONObject("rates").getString("QUID").toFloat()
-        values.PENY = json.getJSONObject("rates").getString("PENY").toFloat()
-        return values
-    }
-
-    fun retrieveCoins(json: JSONObject) : ArrayList<NastyCoin>{
-        val nastycoins: ArrayList<NastyCoin> = ArrayList<NastyCoin>()
-        val jsonarray : JSONArray = json.getJSONArray("features")
-        for(i in 0..49){
-            val n = NastyCoin("", 0f, "", "", Pair(0f, 0f))
-            val k = jsonarray.getJSONObject(i)
-            n.id = k.getJSONObject("properties").getString("id")
-            n.value = k.getJSONObject("properties").getString("value").toFloat()
-            n.currency = k.getJSONObject("properties").getString("currency")
-            n.marker_symbol = k.getJSONObject("properties").getString("marker-symbol")
-            n.coordinates = stringToCoordinates(k.getJSONObject("geometry").getString("coordinates"))
-            nastycoins.add(n)
-        }
-        return nastycoins
-    }
-
-
-    fun stringToCoordinates(s : String) : Pair<Float, Float>{
-        val regex = "-?[0-9]*\\.[0-9]*".toRegex()
-        val ss : Sequence<MatchResult> = regex.findAll(s)
-        val ss1 : String = ss.first().value
-        val ss2 : String = ss.last().value
-        return Pair<Float, Float>(ss1.toFloat(), ss2.toFloat())
     }
 }

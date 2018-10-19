@@ -5,5 +5,5 @@ data class NastyCoin (
         var value: Float,
         var currency: String,
         var marker_symbol: String,
-        var coordinates: Pair<Float, Float>
+        var coordinates: Pair<Double, Double>
 )
