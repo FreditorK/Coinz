@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".Exchange_Pop_Up">
+    android:orientation="vertical">
+
 
     <TextView
         android:id="@+id/broke_text"
@@ -19,15 +18,11 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:text="Tap on item to exchange it."
-        android:textAlignment="center" />
-
-    <ListView
-        android:id="@+id/list_view"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"></ListView>
+        android:layout_height="match_parent"
+        android:text="There are no items to exchange here"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:layout_weight="1"/>
 
     <Button
         android:id="@+id/back_button"

@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class DownloadExchangeRates(private val view: View, private val c: Context?) : AsyncTask<String, Void, Array<String>>() {
+class DownloadExchangeRates(private val c: Context?) : AsyncTask<String, Void, Array<String>>() {
 
     companion object {
 
@@ -110,23 +110,19 @@ class DownloadExchangeRates(private val view: View, private val c: Context?) : A
 
     override fun onPostExecute(result: Array<String>) {
         super.onPostExecute(result)
+        val todaysExchangeRate = ProfileActivity.coinExchangeRates!![0]
         var json: JSONObject
-        val d = arrayOf(Date(ProfileActivity.coinExchangeRates!![0].date.time - 86400000L), Date(ProfileActivity.coinExchangeRates!![0].date.time - 172800000L), Date(ProfileActivity.coinExchangeRates!![0].date.time - 259200000L), Date(ProfileActivity.coinExchangeRates!![0].date.time - 345600000L), Date(ProfileActivity.coinExchangeRates!![0].date.time - 432000000L),
-                Date(ProfileActivity.coinExchangeRates!![0].date.time - 518400000L))
-        if (ProfileActivity.coinExchangeRates!!.size == 7) {
-            for (i in 1..6) {
-                json = JSONObject(result[i - 1])
-                ProfileActivity.coinExchangeRates!![i] = retrieveCoinExchangerates(json, d[i - 1])
-            }
-        } else {
-            val p = ProfileActivity.coinExchangeRates!![0]
-            ProfileActivity.coinExchangeRates!!.clear()
-            ProfileActivity.coinExchangeRates!!.add(p)
-            for (i in 1..6) {
-                json = JSONObject(result[i - 1])
-                ProfileActivity.coinExchangeRates!!.add(retrieveCoinExchangerates(json, d[i - 1]))
-            }
+        val d = arrayOf(Date(todaysExchangeRate.date.time - 86400000L),
+                Date(todaysExchangeRate.date.time - 172800000L),
+                Date(todaysExchangeRate.date.time - 259200000L),
+                Date(todaysExchangeRate.date.time - 345600000L),
+                Date(todaysExchangeRate.date.time - 432000000L),
+                Date(todaysExchangeRate.date.time - 518400000L))
+
+        for (i in 0..5) {
+            json = JSONObject(result[i])
+            ProfileActivity.coinExchangeRates!!.add(retrieveCoinExchangerates(json, d[i]))
         }
-        SubFragmentExchange.initGraphs(view)
+        SubFragmentExchange.initGraphs()
     }
 }

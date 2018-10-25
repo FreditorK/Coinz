@@ -43,7 +43,7 @@
                         android:id="@+id/display_basic_prof"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="14pt"
+                        android:textSize="15pt"
                         android:textColor="@color/white"/>
                 </LinearLayout>
                 <LinearLayout
@@ -59,7 +59,7 @@
                         android:id="@+id/gold_display"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="14pt"
+                        android:textSize="15pt"
                         android:textColor="@color/white"/>
                 </LinearLayout>
             </LinearLayout>

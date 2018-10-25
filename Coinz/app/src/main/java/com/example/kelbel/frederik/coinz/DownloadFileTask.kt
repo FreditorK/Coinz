@@ -2,6 +2,7 @@ package com.example.kelbel.frederik.coinz
 
 import android.content.Context
 import android.os.AsyncTask
+import com.google.gson.Gson
 import org.apache.commons.io.IOUtils
 import org.json.JSONArray
 import org.json.JSONObject
@@ -11,10 +12,12 @@ import java.io.OutputStreamWriter
 import java.io.StringWriter
 import java.net.HttpURLConnection
 import java.net.URL
+import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
-class DownloadFileTask(private val caller : DownloadCompleteListener, private val c: Context?) : AsyncTask<String, Void, String>() {
+class DownloadFileTask(private val c: Context?) : AsyncTask<String, Void, String>() {
 
     companion object {
         fun loadGeoJson(context: Context) {
@@ -97,25 +100,23 @@ class DownloadFileTask(private val caller : DownloadCompleteListener, private va
 
     override fun onPostExecute(result: String) {
         super.onPostExecute(result)
-
-        caller.downloadComplete(result)
-        writeToInternalStorage(DownloadCompleteRunner.result.toString())
+        doStuff(result)
     }
 
-    fun writeToInternalStorage(s : String){
+    fun doStuff(s : String){
         val json  = JSONObject(s)
-        if(ProfileActivity.coinExchangeRates == null){
-            ProfileActivity.coinExchangeRates?.add(retrieveCoinExchangerates(json))
-        }else{
-            if(ProfileActivity.coinExchangeRates!!.size == 0){
-                ProfileActivity.coinExchangeRates?.add(retrieveCoinExchangerates(json))
-            }else {
-                ProfileActivity.coinExchangeRates!![0] = retrieveCoinExchangerates(json)
-            }
-        }
+
         ProfileActivity.nastycoins = retrieveCoins(json)
-        val outputStreamWriter : OutputStreamWriter = OutputStreamWriter(c?.openFileOutput("coinzmap.geojson", Context.MODE_PRIVATE))
-        outputStreamWriter.write(s)
-        outputStreamWriter.close()
+
+        ProfileActivity.coinExchangeRates = ArrayList()
+        val todaysExchangeRate = retrieveCoinExchangerates(json)
+        ProfileActivity.coinExchangeRates!!.add(todaysExchangeRate)
+
+        DownloadExchangeRates(c).execute("http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 86400000L)) + "/coinzmap.geojson",
+                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 172800000L)) + "/coinzmap.geojson",
+                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 259200000L)) + "/coinzmap.geojson",
+                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 345600000L)) + "/coinzmap.geojson",
+                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 432000000L)) + "/coinzmap.geojson",
+                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 518400000L)) + "/coinzmap.geojson")
     }
 }

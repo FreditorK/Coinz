@@ -31,18 +31,16 @@ class SubFragmentExchange : Fragment(), View.OnClickListener{
 
     companion object {
 
-        private var vobj: View? = null
-
         private lateinit var shilChart : ChartView
         private lateinit var dolrChart : ChartView
         private lateinit var quidChart : ChartView
         private lateinit var penyChart : ChartView
 
-        fun initGraphs(view: View) {
-            shilChart = view.findViewById<ChartView>(R.id.shil_graph)
-            dolrChart = view.findViewById<ChartView>(R.id.dolr_graph)
-            quidChart = view.findViewById<ChartView>(R.id.quid_graph)
-            penyChart = view.findViewById<ChartView>(R.id.peny_graph)
+        fun initGraphs() {
+            shilChart.reset()
+            dolrChart.reset()
+            quidChart.reset()
+            penyChart.reset()
             val labels = arrayOf<String>(
                     SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time - 518400000L)),
                     SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time - 432000000L)),
@@ -95,24 +93,31 @@ class SubFragmentExchange : Fragment(), View.OnClickListener{
         dolrButton.setOnClickListener(this)
         quidButton.setOnClickListener(this)
         penyButton.setOnClickListener(this)
-        setUpTextFields()
-        if(ProfileActivity.coinExchangeRates!!.size == 1 || SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time)) != SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Calendar.getInstance().getTime())) {
-            DownloadExchangeRates(view, this.context).execute("http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time - 86400000L)) + "/coinzmap.geojson",
-                    "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time - 172800000L)) + "/coinzmap.geojson",
-                    "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time - 259200000L)) + "/coinzmap.geojson",
-                    "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time - 345600000L)) + "/coinzmap.geojson",
-                    "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time - 432000000L)) + "/coinzmap.geojson",
-                    "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time - 518400000L)) + "/coinzmap.geojson")
-        }else{
-            initGraphs(view)
+
+        shilChart = view.findViewById<ChartView>(R.id.shil_graph)
+        dolrChart = view.findViewById<ChartView>(R.id.dolr_graph)
+        quidChart = view.findViewById<ChartView>(R.id.quid_graph)
+        penyChart = view.findViewById<ChartView>(R.id.peny_graph)
+
+        if(ProfileActivity.coinExchangeRates!!.size == 7) {
+            initGraphs()
         }
+
+        setUpTextFields()
     }
 
     fun setUpTextFields(){
-        shilText.text = "SHIL: " + ProfileActivity.coinExchangeRates!![0].SHIL.toString()
-        dolrText.text = "DOLR: " + ProfileActivity.coinExchangeRates!![0].DOLR.toString()
-        quidText.text = "QUID: " + ProfileActivity.coinExchangeRates!![0].QUID.toString()
-        penyText.text = "PENY: " + ProfileActivity.coinExchangeRates!![0].PENY.toString()
+        if(ProfileActivity.coinExchangeRates != null) {
+            shilText.text = "SHIL: " + ProfileActivity.coinExchangeRates!![0].SHIL.toString()
+            dolrText.text = "DOLR: " + ProfileActivity.coinExchangeRates!![0].DOLR.toString()
+            quidText.text = "QUID: " + ProfileActivity.coinExchangeRates!![0].QUID.toString()
+            penyText.text = "PENY: " + ProfileActivity.coinExchangeRates!![0].PENY.toString()
+        }else{
+            shilText.text = "Not retrievable"
+            dolrText.text = "Not retrievable"
+            quidText.text = "Not retrievable" 
+            penyText.text = "Not retrievable"
+        }
     }
 
     override fun onClick(p0: View?) {

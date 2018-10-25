@@ -37,7 +37,6 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
     private lateinit  var mapView: MapView
 
     private lateinit var map : MapboxMap
-    //private lateinit var originLocation : Location
     private lateinit var permissionsManager: PermissionsManager
     private var locationEngine: LocationEngine? = null
     private var locationLayerPlugin : LocationLayerPlugin? = null
@@ -71,12 +70,12 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
                         .snippet(n.value.toString()))
             }
             enableLocation()
-            shilview = view.findViewById(R.id.shil_textview)
-            dolrview = view.findViewById(R.id.dolr_textview)
-            quidview = view.findViewById(R.id.quid_textview)
-            penyview = view.findViewById(R.id.peny_textview)
-            displayWalletValues()
         }
+        shilview = view.findViewById(R.id.shil_textview)
+        dolrview = view.findViewById(R.id.dolr_textview)
+        quidview = view.findViewById(R.id.quid_textview)
+        penyview = view.findViewById(R.id.peny_textview)
+        displayWalletValues()
     }
 
     fun displayWalletValues(){//update displayed wallet
@@ -94,7 +93,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
     fun checkForCoin(location: Location){//check if a coin can be collected and collect it
         val a = ProfileActivity.nastycoins?.indexOfFirst { i -> compareCoordinates(Pair(location.longitude, location.latitude), i.coordinates)}
         if(a!! > -1){
-            ProfileActivity.collect(ProfileActivity.nastycoins!![a], map.markers[a].icon)
+            ProfileActivity.collect(ProfileActivity.nastycoins!![a])
             ProfileActivity.nastycoins?.removeAt(a)
             map.removeMarker(map.markers[a])
             displayWalletValues()
@@ -139,6 +138,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        displayWalletValues()
     }
 
     override fun onPause() {
@@ -181,7 +181,6 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
 
     override fun onLocationChanged(location: Location?) {
         location?.let{
-            //originLocation = location
             setCameraPosition(location)
             checkForCoin(location)
         }
@@ -212,7 +211,6 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
         }
         val lastLocation = locationEngine?.lastLocation
         if(lastLocation != null){
-            //originLocation = lastLocation
             setCameraPosition(lastLocation)
         }else{
             locationEngine?.addLocationEngineListener(this)
