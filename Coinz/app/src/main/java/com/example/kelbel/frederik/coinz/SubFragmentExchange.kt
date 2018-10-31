@@ -99,8 +99,10 @@ class SubFragmentExchange : Fragment(), View.OnClickListener{
         quidChart = view.findViewById<ChartView>(R.id.quid_graph)
         penyChart = view.findViewById<ChartView>(R.id.peny_graph)
 
-        if(ProfileActivity.coinExchangeRates!!.size == 7) {
-            initGraphs()
+        if(ProfileActivity.coinExchangeRates != null) {
+            if(ProfileActivity.coinExchangeRates!!.size == 7) {
+                initGraphs()
+            }
         }
 
         setUpTextFields()

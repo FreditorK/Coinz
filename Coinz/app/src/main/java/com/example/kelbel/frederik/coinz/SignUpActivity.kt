@@ -90,6 +90,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener{
         user.put("gold", 0.0f)
         user.put("wallet", gson.toJson(Wallet(arrayListOf(), arrayListOf(), arrayListOf(), arrayListOf())))
         user.put("nastycoins", gson.toJson(arrayListOf<NastyCoin>()))
+        user.put("movingSac", true)
 
         // Add a new document with a generated ID
         val db = FirebaseFirestore.getInstance()
@@ -102,6 +103,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener{
                     ProfileActivity.gold = 0.0f
                     ProfileActivity.nastycoins = arrayListOf()
                     ProfileActivity.wallet = Wallet(arrayListOf(), arrayListOf(), arrayListOf(), arrayListOf())
+                    SubFragmentEvents.eventAvailability = true
                     progressBar?.visibility = View.GONE
                     finish()
                     startActivity(Intent(this, ProfileActivity() :: class.java))})

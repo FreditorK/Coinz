@@ -26,6 +26,11 @@ class FragmentDepot : Fragment() {
     private var viewPager : ViewPager? = null
     private var gold_text : TextView? = null
 
+    private var shil_text : TextView? = null
+    private var dolr_text : TextView? = null
+    private var quid_text : TextView? = null
+    private var peny_text : TextView? = null
+
     private var firebaseAuth : FirebaseAuth? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -38,6 +43,12 @@ class FragmentDepot : Fragment() {
         viewPager = view.findViewById(R.id.viewpager_id)
         profile_pic = view.findViewById(R.id.display_profile_pic)
         gold_text = view.findViewById(R.id.gold_display)
+
+        shil_text = view.findViewById(R.id.wallet_shil_text)
+        dolr_text = view.findViewById(R.id.wallet_dolr_text)
+        quid_text = view.findViewById(R.id.wallet_quid_text)
+        peny_text = view.findViewById(R.id.wallet_peny_text)
+
         val adapter = Pager(this.activity?.supportFragmentManager)
 
         firebaseAuth = FirebaseAuth.getInstance()
@@ -65,9 +76,16 @@ class FragmentDepot : Fragment() {
             }
         }
     }
+    fun displayValues(){
+        gold_text?.text = ProfileActivity.gold.toString()
+        shil_text?.text = ProfileActivity.wallet.shilCoins.size.toString()
+        dolr_text?.text = ProfileActivity.wallet.dolrCoins.size.toString()
+        quid_text?.text = ProfileActivity.wallet.quidCoins.size.toString()
+        peny_text?.text = ProfileActivity.wallet.penyCoins.size.toString()
+    }
 
     override fun onResume() {
         super.onResume()
-        gold_text?.text = ProfileActivity.gold.toString()
+        displayValues()
     }
 }

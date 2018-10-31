@@ -1,15 +1,19 @@
 package com.example.kelbel.frederik.coinz
 
+import android.animation.*
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.support.v4.app.Fragment
 import android.support.v4.content.res.ResourcesCompat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -22,6 +26,7 @@ import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
+import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -30,11 +35,22 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
+import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.experimental.launch
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.math.abs
+import kotlin.math.sqrt
 
 class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
 
     private lateinit var v : View
     private lateinit  var mapView: MapView
+    private var lastLocation : Location? = null
+
+    private var marker : Marker? = null
+    private var markerAnimator : ValueAnimator? = null
+    private var countDownTimer : CountDownTimer? = null
 
     private lateinit var map : MapboxMap
     private lateinit var permissionsManager: PermissionsManager
@@ -47,6 +63,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
     private lateinit var dolrview: TextView
     private lateinit var quidview: TextView
     private lateinit var penyview: TextView
+    private lateinit var timer: TextView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         v = inflater.inflate(R.layout.fragment_map, container, false)
@@ -62,7 +79,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
         mapView.getMapAsync{mapboxMap ->
             map = mapboxMap
             map.uiSettings.isCompassEnabled = true
-            for (n in ProfileActivity.nastycoins!!) {
+            for (n in ProfileActivity.nastycoins) {
                 val icon : Icon = IconFactory.getInstance(activity!!.applicationContext).fromBitmap(BitmapFactory.decodeResource(resources, getFittingIconId(n)))
                 map.addMarker(MarkerOptions().setIcon(icon)
                         .position(LatLng(n.coordinates.second, n.coordinates.first))
@@ -75,26 +92,77 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
         dolrview = view.findViewById(R.id.dolr_textview)
         quidview = view.findViewById(R.id.quid_textview)
         penyview = view.findViewById(R.id.peny_textview)
+        timer = view.findViewById(R.id.timer)
         displayWalletValues()
     }
 
     fun displayWalletValues(){//update displayed wallet
-        shilview.text = ProfileActivity.wallet?.shilCoins?.size.toString()
-        dolrview.text = ProfileActivity.wallet?.dolrCoins?.size.toString()
-        quidview.text = ProfileActivity.wallet?.quidCoins?.size.toString()
-        penyview.text = ProfileActivity.wallet?.penyCoins?.size.toString()
+        shilview.text = ProfileActivity.wallet.shilCoins.size.toString()
+        dolrview.text = ProfileActivity.wallet.dolrCoins.size.toString()
+        quidview.text = ProfileActivity.wallet.quidCoins.size.toString()
+        penyview.text = ProfileActivity.wallet.penyCoins.size.toString()
     }
 
     fun getFittingIconId(n : NastyCoin): Int{//Get the Icon to display on the map from Coin
         return  resources.getIdentifier(n.currency + n.marker_symbol, "mipmap", context?.packageName)
     }
 
+    fun addMovingSac(list : ArrayList<LatLng>, durations: ArrayList<Long>){
+        val icon : Icon = IconFactory.getInstance(activity!!.applicationContext).fromBitmap(BitmapFactory.decodeResource(resources, R.mipmap.movingsac))
+        marker = map.addMarker(MarkerOptions().setIcon(icon)
+                .position(list[0])
+                .title("Catch me!"))
+        markerAnimator = ObjectAnimator.ofObject(marker, "position", LatLngEvaluator(), list[0], list[1])
+        updateMovingSac(list, durations, 0)
+        timer.visibility = View.VISIBLE
+        countDownTimer = object: CountDownTimer(durations.sum(), 1000){
+            override fun onTick(p0: Long) {
+                timer.setText("Event finishes in: " + p0 / 1000 + "s")
+                if(p0/1000 < 10){
+                    changeColor()
+                }
+            }
+
+            override fun onFinish() {
+                timer.setTextColor(Color.WHITE)
+                timer.setText("You missed your chance for today.")
+                SubFragmentEvents.eventAvailability = false
+                timer.visibility = View.GONE
+            }
+            fun changeColor(){
+                if(timer.currentTextColor == Color.RED){
+                    timer.setTextColor(Color.WHITE)
+                }else{
+                    timer.setTextColor(Color.RED)
+                }
+            }
+        }.start()
+    }
+
+    fun updateMovingSac(list : ArrayList<LatLng>, durations: ArrayList<Long>, count: Int){
+        markerAnimator?.setDuration(durations[count])//walking speed
+        markerAnimator?.addListener(object: AnimatorListenerAdapter(){
+            override fun onAnimationEnd(animation: Animator?) {
+                super.onAnimationEnd(animation)
+                if(count + 2< list.size) {
+                    markerAnimator = ObjectAnimator.ofObject(marker, "position", LatLngEvaluator(), list[count+1], list[count+2])
+                    updateMovingSac(list, durations,count + 1)
+                }else{
+                    markerAnimator?.end()
+                    map.removeMarker(marker!!)
+                }
+            }
+        })
+        markerAnimator?.start()
+    }
+
     //Coin collection
     fun checkForCoin(location: Location){//check if a coin can be collected and collect it
-        val a = ProfileActivity.nastycoins?.indexOfFirst { i -> compareCoordinates(Pair(location.longitude, location.latitude), i.coordinates)}
-        if(a!! > -1){
-            ProfileActivity.collect(ProfileActivity.nastycoins!![a])
-            ProfileActivity.nastycoins?.removeAt(a)
+        lastLocation = location
+        val a = ProfileActivity.nastycoins.indexOfFirst { i -> compareCoordinates(Pair(location.longitude, location.latitude), i.coordinates)}
+        if(a > -1){
+            ProfileActivity.collect(ProfileActivity.nastycoins[a])
+            ProfileActivity.nastycoins.removeAt(a)
             map.removeMarker(map.markers[a])
             displayWalletValues()
         }
@@ -226,4 +294,24 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
             renderMode = RenderMode.NORMAL
         }
     }
+    inner class LatLngEvaluator : TypeEvaluator<LatLng> {
+    // Method is used to interpolate the marker animation.
+
+    private var latLng : LatLng = LatLng()
+
+        override fun evaluate(fraction: Float, startValue: LatLng?, endValue: LatLng?): LatLng {
+            latLng.setLatitude(startValue!!.getLatitude() + ((endValue!!.getLatitude() - startValue.getLatitude()) * fraction))
+            latLng.setLongitude(startValue.getLongitude() + ((endValue.getLongitude() - startValue.getLongitude()) * fraction))
+            if(latLng.latitude < lastLocation!!.latitude + 0.0002f && latLng.latitude > lastLocation!!.latitude - 0.0002f && latLng.longitude > lastLocation!!.longitude - 0.0002f && latLng.longitude < lastLocation!!.longitude + 0.0002f){
+                markerAnimator?.end()
+                map.removeMarker(marker!!)
+                ProfileActivity.catchMovingSac()
+                displayWalletValues()
+                countDownTimer?.cancel()
+                timer.text = "Congratulations on your catch!"
+                SubFragmentEvents.eventAvailability = false
+            }
+            return latLng
+    }
+  }
 }

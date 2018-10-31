@@ -27,6 +27,8 @@ import com.google.android.gms.tasks.OnSuccessListener
 import android.provider.SyncStateContract.Helpers.update
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.mapbox.mapboxsdk.geometry.LatLng
+import kotlin.math.truncate
 
 
 class ProfileActivity : AppCompatActivity() {
@@ -55,6 +57,32 @@ class ProfileActivity : AppCompatActivity() {
                     "peny" -> wallet.penyCoins.add(n)
                 }
         }
+        fun catchMovingSac(){
+            val r = Random()
+            val i = 1 + r.nextInt(10)
+            for(k in 0..i) {
+                val l = r.nextInt(4)
+                when (l) {
+                    0 -> wallet.shilCoins.add(randomCoin(l, k))
+                    1 -> wallet.dolrCoins.add(randomCoin(l, k))
+                    2 -> wallet.quidCoins.add(randomCoin(l, k))
+                    3 -> wallet.penyCoins.add(randomCoin(l, k))
+                }
+            }
+        }
+        private fun randomCoin(l : Int, k : Int) : NastyCoin{
+            val r = Random()
+            var s  = "shil"
+            when(l){
+                0 -> s = "shil"
+                1 -> s = "dolr"
+                2 -> s = "quid"
+                3 -> s = "peny"
+            }
+            val v = 10*r.nextDouble()
+            val n =NastyCoin("cI-" + System.currentTimeMillis().toString() + k.toString(), v.toFloat(), s, truncate(v).toInt().toString(), Pair(0.0, 0.0))
+            return n
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,7 +105,10 @@ class ProfileActivity : AppCompatActivity() {
 
         bottomNavigationView?.setOnNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.depot_tab -> displayFragmentDepot()
+                R.id.depot_tab -> {
+                    displayFragmentDepot()
+                    fragmentDepot!!.displayValues()
+                }
                 R.id.map_tab -> displayFragmentMap()
                 R.id.settings_tab -> displayFragmentSettings()
             }
@@ -86,11 +117,12 @@ class ProfileActivity : AppCompatActivity() {
         displayFragmentDepot()
     }
 
-    protected fun displayFragmentDepot() {
+    fun displayFragmentDepot() {
         val ft = supportFragmentManager.beginTransaction()
         if (fragmentDepot!!.isAdded()) {
             ft.show(fragmentDepot)
         } else {
+            ft.add(R.id.start_frame, fragmentMap, "B")//codependent fragments
             ft.add(R.id.start_frame, fragmentDepot, "A")
         }
         if (fragmentMap!!.isAdded()) {
@@ -101,7 +133,7 @@ class ProfileActivity : AppCompatActivity() {
         }
         ft.commit()
     }
-    protected fun displayFragmentMap() {
+    fun displayFragmentMap() {
         val ft = supportFragmentManager.beginTransaction()
         if (fragmentMap!!.isAdded()) {
             ft.show(fragmentMap)
@@ -116,8 +148,7 @@ class ProfileActivity : AppCompatActivity() {
         }
         ft.commit()
     }
-
-    protected fun displayFragmentSettings() {
+    fun displayFragmentSettings() {
         val ft = supportFragmentManager.beginTransaction()
         if (fragmentSettings!!.isAdded()) {
             ft.show(fragmentSettings)
@@ -174,6 +205,9 @@ class ProfileActivity : AppCompatActivity() {
         db.update("nastycoins", gson.toJson(nastycoins))
                 .addOnSuccessListener({})
                 .addOnFailureListener({})
+        db.update("movingSac", SubFragmentEvents.eventAvailability)
+                .addOnSuccessListener({})
+                .addOnFailureListener({})
     }
 
     /*private fun uploadToFirebase(){
@@ -199,6 +233,7 @@ class ProfileActivity : AppCompatActivity() {
         if (downloadDate != getCurrentDate()) {
             downloadDate = getCurrentDate()
             DownloadFileTask(this).execute("http://homepages.inf.ed.ac.uk/stg/coinz/" + downloadDate + "/coinzmap.geojson")
+            SubFragmentEvents.eventAvailability = true
         }
         coinExchangeRates = gson.fromJson<ArrayList<CoinExchangeRates>>(getSharedPreferences("General", Context.MODE_PRIVATE).getString("ER", ""), object : TypeToken<ArrayList<CoinExchangeRates>>() {}.type)
         setUpFragments()

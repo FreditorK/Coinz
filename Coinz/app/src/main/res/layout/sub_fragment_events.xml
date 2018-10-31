@@ -1,6 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/colorPrimary"
+        android:layout_margin="2dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:background="@color/colorPrimary"
+        android:layout_weight="1">
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@mipmap/movingsac"
+            android:background="@color/whiteTransparent"
+            android:layout_margin="1dp"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/catchmeifyoucan"
+            android:background="@color/whiteTransparent"
+            android:layout_margin="1dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="These rats are getting smarter. They are using up our coins. Are they heading for the Big Cheese or maybe some cheesy Nachos at Teviot? Who knows? Hunt them down for big coin rewards."
+            android:background="@color/whiteTransparent"
+            android:textSize="16sp"
+            android:padding="2dp"
+            android:layout_margin="2dp"/>
+        <com.ebanx.swipebtn.SwipeButton
+            android:id="@+id/swipe_btn2"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="3dp"
+            app:inner_text="Start Event"
+            app:inner_text_color="@android:color/white"
+            app:inner_text_size="15sp"
+            app:inner_text_top_padding="3dp"
+            app:inner_text_bottom_padding="3dp"
+            app:inner_text_background="@drawable/shape_rounded"
+            app:button_image_disabled="@mipmap/enabled"
+            app:button_image_enabled="@mipmap/disabled"
+            app:button_image_height="30dp"
+            app:button_image_width="40dp"
+            app:button_left_padding="3dp"
+            app:button_right_padding="5dp"
+            app:button_top_padding="3dp"
+            app:button_bottom_padding="3dp"
+            app:button_background="@drawable/shape_button"
+            app:initial_state="disabled"
+            app:has_activate_state="true">
+        </com.ebanx.swipebtn.SwipeButton>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Coins collected here bear the prefix cI in their ID."
+            android:background="@color/whiteTransparent"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:padding="2dp"
+            android:layout_margin="2dp"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:background="@color/colorPrimary"
+        android:layout_margin="2dp"
+        android:gravity="center_vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="More events will follow..."
+            android:textSize="25sp"
+            android:textAlignment="center"
+            android:textColor="@color/whiteTransparent"/>
+
+    </LinearLayout>
 
 </LinearLayout>

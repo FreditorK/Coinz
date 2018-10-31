@@ -7,6 +7,7 @@ import android.graphics.drawable.GradientDrawable
 import android.opengl.Visibility
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.support.annotation.DrawableRes
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -34,6 +35,7 @@ import com.google.firebase.auth.FirebaseAuth
 class Browse_Offers : AppCompatActivity() {
 
     private lateinit var back_button: Button
+    private lateinit var current_gold: TextView
 
     private lateinit var mRecyclerView: RecyclerView
     private var fRecyclerAdapter: FirestoreRecyclerAdapter<TradeOffer, TradeOfferHolder>? = null
@@ -48,6 +50,8 @@ class Browse_Offers : AppCompatActivity() {
 
         mRecyclerView = findViewById(R.id.rec_list_view)
         back_button = findViewById(R.id.back_button)
+        current_gold = findViewById(R.id.current_gold)
+        current_gold.text = ProfileActivity.gold.toString()
         back_button.setOnClickListener{
             val i = Intent(applicationContext, ProfileActivity :: class.java)
             i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
@@ -70,11 +74,8 @@ class Browse_Offers : AppCompatActivity() {
 
                     offerList = mutableListOf()
 
-                    val user = FirebaseAuth.getInstance().currentUser?.email
-
                     if (documentSnapshots != null) {
                         for (doc in documentSnapshots) {
-                            if(doc.get("user").toString() != user) {
                                 val offer = TradeOffer()
                                 offer.id = doc.reference
                                 offer.user = doc.get("user").toString()
@@ -94,7 +95,6 @@ class Browse_Offers : AppCompatActivity() {
                                     offer.children?.add(s)
                                 }
                                 offerList.add(offer)
-                            }
                         }
                     }
 
@@ -123,47 +123,53 @@ class Browse_Offers : AppCompatActivity() {
     }
 
     private fun loadOffers() {
+
+        val user = FirebaseAuth.getInstance().currentUser?.email
         val options = FirestoreRecyclerOptions.Builder<TradeOffer>()
                 .setQuery(db, TradeOffer::class.java)
                 .build()
         fRecyclerAdapter = object : FirestoreRecyclerAdapter<TradeOffer, TradeOfferHolder>(options) {
             override fun onBindViewHolder(holder: TradeOfferHolder, position: Int, offer: TradeOffer) {
                 if(offerList.size > 0) {
-                    val o = offerList[position]
-                    holder.user?.text = "Offered by: " + o.user?.substringBefore('@')
-                    holder.gold?.text = "Price: " + o.gold.toString()
-                    holder.worth?.text = "Current worth: " + o.worth.toString()
-                    holder.swipeButton?.setOnStateChangeListener(object : OnStateChangeListener {
-                        override fun onStateChange(active: Boolean) {
-                            executeOrder66(o)
+                    if (offerList[position].user != user) {
+                        val o = offerList[position]
+                        holder.user?.text = "Offered by: " + o.user?.substringBefore('@')
+                        holder.gold?.text = "Price: " + o.gold.toString()
+                        holder.worth?.text = "Current worth: " + o.worth.toString()
+                        holder.swipeButton?.setOnStateChangeListener(object : OnStateChangeListener {
+                            override fun onStateChange(active: Boolean) {
+                                if (o.gold!! <= ProfileActivity.gold) {
+                                    executeOrder66(o)
+                                } else {
+                                    holder.swipeButton?.setEnabledDrawable(getDrawable(R.mipmap.denied))
+                                    Toast.makeText(baseContext, "Not enough gold in depot!", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        })
+                        val noOfChildTextViews = holder.child_items?.childCount
+                        val noOfChild = o.children!!.size
+                        if (noOfChild < noOfChildTextViews!!) {
+                            for (index in noOfChild until noOfChildTextViews) {
+                                val currentView = holder.child_items?.getChildAt(index) as LinearLayout
+                                currentView.visibility = View.GONE
+                            }
                         }
-                    })
-                    val noOfChildTextViews = holder.child_items?.childCount
-                    val noOfChild = o.children!!.size
-                    if (noOfChild < noOfChildTextViews!!) {
-                        for (index in noOfChild until noOfChildTextViews) {
-                            val currentView = holder.child_items?.getChildAt(index) as LinearLayout
-                            currentView.visibility = View.GONE
+                        for (ViewIndex in 0 until noOfChild) {
+                            val currentView = holder.child_items?.getChildAt(ViewIndex) as LinearLayout
+                            (currentView.getChildAt(0) as ImageView).setImageResource(o.children?.get(ViewIndex)?.picRef!!)
+                            val sublayout = currentView.getChildAt(1) as LinearLayout
+                            (sublayout.getChildAt(0) as TextView).text = o.children?.get(ViewIndex)?.id
+                            (sublayout.getChildAt(1) as TextView).text = "Value: " + o.children?.get(ViewIndex)?.value.toString()
                         }
-                    }
-                    for (ViewIndex in 0 until noOfChild) {
-                        val currentView = holder.child_items?.getChildAt(ViewIndex) as LinearLayout
-                        (currentView.getChildAt(0) as ImageView).setImageResource(o.children?.get(ViewIndex)?.picRef!!)
-                        val sublayout = currentView.getChildAt(1) as LinearLayout
-                        (sublayout.getChildAt(0) as TextView).text = o.children?.get(ViewIndex)?.id
-                        (sublayout.getChildAt(1) as TextView).text = "Value: " + o.children?.get(ViewIndex)?.value.toString()
+                    }else{
+                        holder.itemView.visibility = View.GONE
                     }
                 }
             }
 
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TradeOfferHolder {
-                val view : View
-                if(offerList.size > 0) {
-                    view = LayoutInflater.from(parent.context).inflate(R.layout.browse_item, parent, false)
-                }else{
-                    view = LayoutInflater.from(parent.context).inflate(R.layout.browse_cover_up, parent, false)
-                }
-                    return TradeOfferHolder(view, offerList, applicationContext)
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.browse_item, parent, false)
+                return TradeOfferHolder(view, offerList, baseContext)
             }
 
             override fun onError(e: FirebaseFirestoreException) {
@@ -172,18 +178,34 @@ class Browse_Offers : AppCompatActivity() {
             }
 
             fun executeOrder66(offer : TradeOffer){
-                for(n in offer.children!!){
-                    ProfileActivity.collect(NastyCoin(n.id!!, n.value!!.toFloat(), n.currency!!, n.marker_symbol!!, n.coordinates!!))
-                }
-                ProfileActivity.gold -= offer.gold!!.toFloat()
-                offer.id?.delete()!!
-                        .addOnSuccessListener({
-                            Toast.makeText(applicationContext, "Trade executed", Toast.LENGTH_SHORT).show()
-                        })
-                        .addOnFailureListener({
-                            e -> Log.w("Browse_Offers", "Error receiving document", e)
-                            Toast.makeText(applicationContext, "Trade could not be executed. Try again later.", Toast.LENGTH_SHORT).show()
-                        })
+                FirebaseFirestore.getInstance().collection("users").document(offer.user.toString())
+                        .get()
+                        .addOnSuccessListener {
+                            val currentGold = it.getDouble("gold")
+                            Log.d("goldig", offer.gold.toString() + "/" + currentGold.toString())
+                            FirebaseFirestore.getInstance().collection("users").document(offer.user.toString())
+                                    .update("gold", offer.gold!! + currentGold!!)
+                                    .addOnSuccessListener { it2 ->
+                                        offer.id?.delete()!!
+                                                .addOnSuccessListener{it3 ->
+                                                    Toast.makeText(applicationContext, "Trade executed", Toast.LENGTH_SHORT).show()
+                                                    for(n in offer.children!!){
+                                                        ProfileActivity.collect(NastyCoin(n.id!!, n.value!!.toFloat(), n.currency!!, n.marker_symbol!!, n.coordinates!!))
+                                                    }
+                                                    ProfileActivity.gold -= offer.gold!!.toFloat()
+                                                    current_gold.text = ProfileActivity.gold.toString()
+                                                }
+                                                .addOnFailureListener{
+                                                    e -> Log.w("Browse_Offers", "Error deleting offer", e)
+                                                    Toast.makeText(applicationContext, "Trade could not be executed. Try again later.", Toast.LENGTH_SHORT).show()
+                                                }
+                                    }
+                                    .addOnFailureListener{
+                                        e -> Log.w("Browse_Offers", "Error updating gold status", e)
+                                    }                        }
+                        .addOnFailureListener{
+                            e -> Log.w("Browse_Offers", "Error receiving gold status", e)
+                        }
             }
         }
 
@@ -226,6 +248,7 @@ class Browse_Offers : AppCompatActivity() {
                     linearlay.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
                     linearlay.orientation = LinearLayout.HORIZONTAL
                     linearlay2.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                    linearlay2.orientation = LinearLayout.VERTICAL
 
                     linearlay2.addView(textView)
                     linearlay2.addView(textView2)

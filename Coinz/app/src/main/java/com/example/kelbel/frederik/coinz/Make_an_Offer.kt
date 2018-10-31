@@ -82,10 +82,10 @@ class Make_an_Offer : AppCompatActivity(), AdapterView.OnItemClickListener, View
 
     fun selectOrUnselect(view : View?, pos : Int){
         if(selectedCoins.contains(listCoins[pos])){
-            view?.setBackgroundColor(Color.WHITE)
+            view?.background = getDrawable(R.color.colorPrimary)
             selectedCoins.remove(listCoins[pos])
         }else{
-            view?.setBackgroundColor(Color.LTGRAY)
+            view?.background = getDrawable(R.color.colorAccent)
             selectedCoins.add(listCoins[pos])
         }
     }

@@ -98,6 +98,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                             ProfileActivity.gold = document.getDouble("gold")!!.toFloat()
                             ProfileActivity.wallet = gson.fromJson<Wallet>(document.getString("wallet"), object : TypeToken<Wallet>() {}.type)
                             ProfileActivity.nastycoins = gson.fromJson<ArrayList<NastyCoin>>(document.getString("nastycoins"), object : TypeToken<ArrayList<NastyCoin>>() {}.type)
+                            SubFragmentEvents.eventAvailability = document.getBoolean("movingSac")!!
                             Toast.makeText(applicationContext, "Log in successful", Toast.LENGTH_SHORT).show()
                             progressBar?.visibility = View.GONE
                             finish()
