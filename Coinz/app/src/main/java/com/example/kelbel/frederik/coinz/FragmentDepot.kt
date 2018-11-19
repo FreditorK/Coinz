@@ -31,7 +31,11 @@ class FragmentDepot : Fragment() {
     private var quid_text : TextView? = null
     private var peny_text : TextView? = null
 
+    private var team_logo : ImageView? = null
+
     private var firebaseAuth : FirebaseAuth? = null
+
+    private var account : SubFragmentAccount? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_depot, container, false)
@@ -49,11 +53,18 @@ class FragmentDepot : Fragment() {
         quid_text = view.findViewById(R.id.wallet_quid_text)
         peny_text = view.findViewById(R.id.wallet_peny_text)
 
+        team_logo = view.findViewById(R.id.team_logo)
+
+        if(ProfileActivity.team == 1){
+            team_logo?.setImageResource(R.mipmap.coincarver)
+        }
+
         val adapter = Pager(this.activity?.supportFragmentManager)
 
         firebaseAuth = FirebaseAuth.getInstance()
 
-        adapter.AddFragment(SubFragmentAccount(), "Account")
+        account = SubFragmentAccount()
+        adapter.AddFragment(account!!, "Account")
         adapter.AddFragment(SubFragmentExchange(), "Exchange")
         adapter.AddFragment(SubFragmentTrading(), "Trading")
         adapter.AddFragment(SubFragmentEvents(), "Events")
@@ -75,6 +86,10 @@ class FragmentDepot : Fragment() {
                         .into(profile_pic)
             }
         }
+    }
+
+    fun getAccount(): SubFragmentAccount?{
+        return account
     }
     fun displayValues(){
         gold_text?.text = ProfileActivity.gold.toString()

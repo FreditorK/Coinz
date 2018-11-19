@@ -36,6 +36,7 @@
             android:id="@+id/gold_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/white"
             android:hint="How much Gold do you want?"
             android:textColorHint="@color/whiteTransparent"
             android:inputType="numberDecimal" />

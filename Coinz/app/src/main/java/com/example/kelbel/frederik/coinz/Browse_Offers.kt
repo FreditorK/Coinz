@@ -163,6 +163,7 @@ class Browse_Offers : AppCompatActivity() {
                         }
                     }else{
                         holder.itemView.visibility = View.GONE
+                        holder.itemView.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0)
                     }
                 }
             }

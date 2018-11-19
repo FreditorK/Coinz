@@ -1,11 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <GridLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="2dp"
+    android:background="@color/colorPrimary"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Zone-Balance"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        android:background="@color/colorPrimaryDark"
+        android:layout_margin="1dp"/>
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:rowCount="10"
-        android:columnCount="10"></GridLayout>
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:layout_weight="1">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="bottom"
+            android:orientation="vertical"
+            android:layout_margin="1dp"
+            android:background="@color/colorPrimaryDark">
+            <ImageView
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:src="@mipmap/goldcreeper" />
+            <LinearLayout
+                android:id="@+id/creeperbar"
+                android:orientation="vertical"
+                android:layout_gravity="center"
+                android:layout_width="100dp"
+                android:layout_height="0dp"
+                android:background="@color/coinRedAccent"
+                android:layout_marginBottom="10dp"/>
+            <TextView
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gold Creepers"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="bottom"
+            android:orientation="vertical"
+            android:layout_margin="1dp"
+            android:background="@color/colorPrimaryDark">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:src="@mipmap/coincarver"
+                android:layout_gravity="center"/>
+
+            <LinearLayout
+                android:id="@+id/carverbar"
+                android:orientation="vertical"
+                android:layout_width="100dp"
+                android:layout_height="0dp"
+                android:background="@color/coinBlueAccent"
+                android:layout_marginBottom="10dp"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Coin Carvers"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+    </LinearLayout>
+    <Button
+        android:id="@+id/support_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Support Team"
+        android:textColor="@color/white"
+        android:background="@color/coinRedAccent"
+        android:layout_gravity="center"
+        android:textSize="16sp"
+        android:layout_margin="2dp"/>
 </LinearLayout>

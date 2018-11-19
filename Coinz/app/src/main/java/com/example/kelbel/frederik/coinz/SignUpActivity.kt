@@ -1,17 +1,15 @@
 package com.example.kelbel.frederik.coinz
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
-import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import android.util.Log
+import android.widget.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 
@@ -25,6 +23,8 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener{
 
     private var firebaseAuth : FirebaseAuth? = null
 
+    private var selectedTeam = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
@@ -37,6 +37,22 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener{
 
         findViewById<Button>(R.id.sign_up_button).setOnClickListener(this)
         findViewById<TextView>(R.id.log_in_textView).setOnClickListener(this)
+
+        val listItemsTxt = arrayOf(" Gold-Creeper", " Coin-Carver")
+        val images = arrayOf(R.mipmap.goldcreeper, R.mipmap.coincarver)
+
+        val spinnerAdapter: CustomDropDownAdapter = CustomDropDownAdapter(this, listItemsTxt, images)
+        val spinner: Spinner = this.findViewById(R.id.team_spinner) as Spinner
+        spinner.adapter = spinnerAdapter
+        spinner.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                selectedTeam = p2
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                selectedTeam = 0
+            }
+        })
     }
 
     private fun register(){
@@ -91,10 +107,10 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener{
         user.put("wallet", gson.toJson(Wallet(arrayListOf(), arrayListOf(), arrayListOf(), arrayListOf())))
         user.put("nastycoins", gson.toJson(arrayListOf<NastyCoin>()))
         user.put("movingSac", true)
+        user.put("team", selectedTeam)
 
         // Add a new document with a generated ID
-        val db = FirebaseFirestore.getInstance()
-        db.collection("users").document(username)
+        FirebaseFirestore.getInstance().collection("users").document(username)
                 .set(user)
                 .addOnSuccessListener({
                     Toast.makeText(applicationContext, "Sign up successful", Toast.LENGTH_SHORT).show()
@@ -103,6 +119,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener{
                     ProfileActivity.gold = 0.0f
                     ProfileActivity.nastycoins = arrayListOf()
                     ProfileActivity.wallet = Wallet(arrayListOf(), arrayListOf(), arrayListOf(), arrayListOf())
+                    ProfileActivity.team = selectedTeam
                     SubFragmentEvents.eventAvailability = true
                     progressBar?.visibility = View.GONE
                     finish()

@@ -43,6 +43,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var user : String
 
     companion object {
+        var team : Int = 0
         var downloadDate : String = ""
         var exchangedCount : Int = 0
         var gold : Float = 0.0f
@@ -210,71 +211,15 @@ class ProfileActivity : AppCompatActivity() {
                 .addOnFailureListener({})
     }
 
-    /*private fun uploadToFirebase(){
-        val f = File(this.applicationInfo.dataDir + "/shared_prefs/" + user + ".xml")
-        val profileRef = FirebaseStorage.getInstance().getReference("profiledata/" + user  + ".xml")
-        if (f.exists()) {
-            val file = Uri.fromFile(f)
-            profileRef.putFile(file).addOnSuccessListener { taskSnapshot ->
-                taskSnapshot.storage.downloadUrl.addOnCompleteListener{
-                    task -> if(!task.isSuccessful){
-                    Toast.makeText(this, "Check Connection! Progress locally saved!", Toast.LENGTH_SHORT).show()
-                }
-                }                        }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
-                        Toast.makeText(this, "Check Connection! Progress locally saved!", Toast.LENGTH_SHORT).show()
-                    }
-        }
-    }*/
-
     private fun getLocalAndWebData(){
         val gson = Gson()
         if (downloadDate != getCurrentDate()) {
             downloadDate = getCurrentDate()
             DownloadFileTask(this).execute("http://homepages.inf.ed.ac.uk/stg/coinz/" + downloadDate + "/coinzmap.geojson")
             SubFragmentEvents.eventAvailability = true
+            exchangedCount = 0
         }
         coinExchangeRates = gson.fromJson<ArrayList<CoinExchangeRates>>(getSharedPreferences("General", Context.MODE_PRIVATE).getString("ER", ""), object : TypeToken<ArrayList<CoinExchangeRates>>() {}.type)
         setUpFragments()
     }
-
-    /*private fun retrieveProgress(){
-        //val mPrefs = getSharedPreferences(user, Context.MODE_PRIVATE)
-        val msharedPrefs = getSharedPreferences("General", Context.MODE_PRIVATE)
-        downloadDate = msharedPrefs.getString("lD", "").toString()
-
-        val gson = Gson()
-        var json : String
-        if (downloadDate != getCurrentDate()){
-            downloadDate = getCurrentDate()
-            //exchangedCount = 0
-            json = msharedPrefs.getString("ER", "")
-            coinExchangeRates = gson.fromJson<ArrayList<CoinExchangeRates>>(json, object : TypeToken<ArrayList<CoinExchangeRates>>() {}.type)
-            if(coinExchangeRates == null){
-                coinExchangeRates = ArrayList()
-            }
-            DownloadFileTask(this).execute("http://homepages.inf.ed.ac.uk/stg/coinz/" + downloadDate + "/coinzmap.geojson")
-        }else{
-            /*if(mPrefs.contains("NC")) {
-                json = mPrefs.getString("NC", "")
-                nastycoins = gson.fromJson<ArrayList<NastyCoin>>(json, object : TypeToken<ArrayList<NastyCoin>>() {}.type)
-            }else{
-                DownloadFileTask.loadGeoJson(this)
-            }*/
-            json = msharedPrefs.getString("ER", "")
-            coinExchangeRates = gson.fromJson<ArrayList<CoinExchangeRates>>(json, object : TypeToken<ArrayList<CoinExchangeRates>>() {}.type)
-            //exchangedCount = mPrefs.getInt("EC", 0)
-        }
-
-        /*val json2 = mPrefs.getString("Wallet", "")
-        if(json2 != ""){
-            wallet = gson.fromJson<Wallet>(json2, Wallet::class.java)
-        }else{
-            wallet = Wallet(arrayListOf(), arrayListOf(), arrayListOf(), arrayListOf())
-        }*/
-
-        //gold = mPrefs.getFloat("Gold", 0.0f)
-        setUpFragments()
-    }*/
 }

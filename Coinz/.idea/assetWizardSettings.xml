@@ -78,25 +78,14 @@
                                           </PersistentState>
                                         </value>
                                       </entry>
-                                      <entry key="image">
-                                        <value>
-                                          <PersistentState>
-                                            <option name="values">
-                                              <map>
-                                                <entry key="paddingPercent" value="25" />
-                                              </map>
-                                            </option>
-                                          </PersistentState>
-                                        </value>
-                                      </entry>
                                     </map>
                                   </option>
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="imageAsset" value="C:\Users\Frederik\Pictures\Coins\MovingSac.png" />
-                                      <entry key="outputName" value="movingsac" />
+                                      <entry key="imageAsset" value="C:\Users\Frederik\Pictures\Coins\LauncherIcon.png" />
+                                      <entry key="outputName" value="launchericon" />
                                     </map>
                                   </option>
                                 </PersistentState>

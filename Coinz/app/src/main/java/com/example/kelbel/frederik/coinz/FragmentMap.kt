@@ -8,15 +8,15 @@ import android.location.Location
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.support.v4.app.Fragment
-import android.support.v4.content.res.ResourcesCompat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.FirebaseFirestore
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.location.LocationEnginePriority
@@ -24,10 +24,7 @@ import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.annotations.Icon
-import com.mapbox.mapboxsdk.annotations.IconFactory
-import com.mapbox.mapboxsdk.annotations.Marker
-import com.mapbox.mapboxsdk.annotations.MarkerOptions
+import com.mapbox.mapboxsdk.annotations.*
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
@@ -35,27 +32,22 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
-import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.abs
-import kotlin.math.sqrt
 
-class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
+class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
 
-    private lateinit var v : View
-    private lateinit  var mapView: MapView
-    private var lastLocation : Location? = null
+    private lateinit var v: View
+    private lateinit var mapView: MapView
+    private var lastLocation: Location? = null
 
-    private var marker : Marker? = null
-    private var markerAnimator : ValueAnimator? = null
-    private var countDownTimer : CountDownTimer? = null
+    private var marker: Marker? = null
+    private var markerAnimator: ValueAnimator? = null
+    private var countDownTimer: CountDownTimer? = null
 
-    private lateinit var map : MapboxMap
+    private lateinit var map: MapboxMap
     private lateinit var permissionsManager: PermissionsManager
     private var locationEngine: LocationEngine? = null
-    private var locationLayerPlugin : LocationLayerPlugin? = null
+    private var locationLayerPlugin: LocationLayerPlugin? = null
 
     private val t = "FragmentMap"
 
@@ -64,6 +56,11 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
     private lateinit var quidview: TextView
     private lateinit var penyview: TextView
     private lateinit var timer: TextView
+
+    val rows = arrayOf(55.946233, 55.9455098, 55.9447866, 55.9440634, 55.9433402, 55.942617)
+    val columns = arrayOf(-3.192473, -3.1908422, -3.1892114, -3.1875806, -3.1859498, -3.184319)
+
+    val cbs = arrayOf(Color.parseColor("#90020051"), Color.parseColor("#9004008e"), Color.parseColor("#900700cc"), Color.parseColor("#90514cdb"), Color.parseColor("#909b88eb"))
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         v = inflater.inflate(R.layout.fragment_map, container, false)
@@ -76,11 +73,12 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
         mapView = v.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync{mapboxMap ->
+        mapView.getMapAsync { mapboxMap ->
             map = mapboxMap
             map.uiSettings.isCompassEnabled = true
+            drawPolygon(map)
             for (n in ProfileActivity.nastycoins) {
-                val icon : Icon = IconFactory.getInstance(activity!!.applicationContext).fromBitmap(BitmapFactory.decodeResource(resources, getFittingIconId(n)))
+                val icon: Icon = IconFactory.getInstance(activity!!.applicationContext).fromBitmap(BitmapFactory.decodeResource(resources, getFittingIconId(n)))
                 map.addMarker(MarkerOptions().setIcon(icon)
                         .position(LatLng(n.coordinates.second, n.coordinates.first))
                         .title(n.id)
@@ -96,29 +94,94 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
         displayWalletValues()
     }
 
-    fun displayWalletValues(){//update displayed wallet
+    fun drawPolygon(mapboxMap: MapboxMap) {
+        for (r in 0..4) {
+            for (c in 0..4) {
+                val polygon = ArrayList<LatLng>()
+                polygon.add(LatLng(rows[r], columns[c]))
+                polygon.add(LatLng(rows[r], columns[c + 1]))
+                polygon.add(LatLng(rows[r + 1], columns[c + 1]))
+                polygon.add(LatLng(rows[r + 1], columns[c]))
+                mapboxMap.addPolygon(PolygonOptions().alpha(0.5f).strokeColor(Color.parseColor("#00ffffff"))
+                        .addAll(polygon))
+            }
+        }
+
+        val ref = FirebaseFirestore.getInstance()
+
+        for (num in 0..24) {
+            ref.collection("zones").document(num.toString())
+                    .get()
+                    .addOnCompleteListener({ task ->
+                        if (task.isSuccessful) {
+                            val document = task.result
+                            if (document!!.exists()) {
+                                val c = document.getLong("c")!!.toInt()
+                                mapboxMap.polygons[num].fillColor = c
+                                if (cbs.contains(c)) {
+                                    SubFragmentAccount.carversize += 1
+                                } else {
+                                    SubFragmentAccount.creepersize += 1
+                                }
+                                (fragmentManager?.findFragmentByTag("A") as FragmentDepot).getAccount()?.updateBars()
+                            } else {
+                                Toast.makeText(this.context, "Check your Connection!", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            Toast.makeText(this.context, "Check your Connection!", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+        }
+
+        FirebaseFirestore.getInstance().collection("zones")
+                .addSnapshotListener(EventListener { documentSnapshots, e ->
+                    if (e != null) {
+                        Log.e("TeamZone", "Listen failed!", e)
+                        return@EventListener
+                    }
+
+                    if (documentSnapshots != null) {
+                        for (doc in documentSnapshots.documentChanges) {
+                            if (doc.type == DocumentChange.Type.MODIFIED) {
+                                val c = doc.getDocument().getLong("c")!!.toInt()
+                                mapboxMap.polygons[doc.document.id.toInt()].fillColor = c
+                                if (cbs.contains(c)) {
+                                    SubFragmentAccount.carversize += 1
+                                    SubFragmentAccount.creepersize -= 1
+                                } else {
+                                    SubFragmentAccount.creepersize += 1
+                                    SubFragmentAccount.carversize -= 1
+                                }
+                                (fragmentManager?.findFragmentByTag("A") as FragmentDepot).getAccount()?.updateBars()
+                            }
+                        }
+                    }
+                })
+    }
+
+    fun displayWalletValues() {//update displayed wallet
         shilview.text = ProfileActivity.wallet.shilCoins.size.toString()
         dolrview.text = ProfileActivity.wallet.dolrCoins.size.toString()
         quidview.text = ProfileActivity.wallet.quidCoins.size.toString()
         penyview.text = ProfileActivity.wallet.penyCoins.size.toString()
     }
 
-    fun getFittingIconId(n : NastyCoin): Int{//Get the Icon to display on the map from Coin
-        return  resources.getIdentifier(n.currency + n.marker_symbol, "mipmap", context?.packageName)
+    fun getFittingIconId(n: NastyCoin): Int {//Get the Icon to display on the map from Coin
+        return resources.getIdentifier(n.currency + n.marker_symbol, "mipmap", context?.packageName)
     }
 
-    fun addMovingSac(list : ArrayList<LatLng>, durations: ArrayList<Long>){
-        val icon : Icon = IconFactory.getInstance(activity!!.applicationContext).fromBitmap(BitmapFactory.decodeResource(resources, R.mipmap.movingsac))
+    fun addMovingSac(list: ArrayList<LatLng>, durations: ArrayList<Long>) {
+        val icon: Icon = IconFactory.getInstance(activity!!.applicationContext).fromBitmap(BitmapFactory.decodeResource(resources, R.mipmap.movingsac))
         marker = map.addMarker(MarkerOptions().setIcon(icon)
                 .position(list[0])
                 .title("Catch me!"))
         markerAnimator = ObjectAnimator.ofObject(marker, "position", LatLngEvaluator(), list[0], list[1])
         updateMovingSac(list, durations, 0)
         timer.visibility = View.VISIBLE
-        countDownTimer = object: CountDownTimer(durations.sum(), 1000){
+        countDownTimer = object : CountDownTimer(durations.sum(), 1000) {
             override fun onTick(p0: Long) {
                 timer.setText("Event finishes in: " + p0 / 1000 + "s")
-                if(p0/1000 < 10){
+                if (p0 / 1000 < 10) {
                     changeColor()
                 }
             }
@@ -129,25 +192,26 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
                 SubFragmentEvents.eventAvailability = false
                 timer.visibility = View.GONE
             }
-            fun changeColor(){
-                if(timer.currentTextColor == Color.RED){
+
+            fun changeColor() {
+                if (timer.currentTextColor == Color.RED) {
                     timer.setTextColor(Color.WHITE)
-                }else{
+                } else {
                     timer.setTextColor(Color.RED)
                 }
             }
         }.start()
     }
 
-    fun updateMovingSac(list : ArrayList<LatLng>, durations: ArrayList<Long>, count: Int){
+    fun updateMovingSac(list: ArrayList<LatLng>, durations: ArrayList<Long>, count: Int) {
         markerAnimator?.setDuration(durations[count])//walking speed
-        markerAnimator?.addListener(object: AnimatorListenerAdapter(){
+        markerAnimator?.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
-                if(count + 2< list.size) {
-                    markerAnimator = ObjectAnimator.ofObject(marker, "position", LatLngEvaluator(), list[count+1], list[count+2])
-                    updateMovingSac(list, durations,count + 1)
-                }else{
+                if (count + 2 < list.size) {
+                    markerAnimator = ObjectAnimator.ofObject(marker, "position", LatLngEvaluator(), list[count + 1], list[count + 2])
+                    updateMovingSac(list, durations, count + 1)
+                } else {
                     markerAnimator?.end()
                     map.removeMarker(marker!!)
                 }
@@ -157,18 +221,22 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
     }
 
     //Coin collection
-    fun checkForCoin(location: Location){//check if a coin can be collected and collect it
+    fun checkForCoin(location: Location) {//check if a coin can be collected and collect it
         lastLocation = location
-        val a = ProfileActivity.nastycoins.indexOfFirst { i -> compareCoordinates(Pair(location.longitude, location.latitude), i.coordinates)}
-        if(a > -1){
-            ProfileActivity.collect(ProfileActivity.nastycoins[a])
-            ProfileActivity.nastycoins.removeAt(a)
-            map.removeMarker(map.markers[a])
-            displayWalletValues()
+        val a = ProfileActivity.nastycoins.indexOfFirst { i -> compareCoordinates(Pair(location.longitude, location.latitude), i.coordinates) }
+        if (a > -1) {
+            if (checkIfValidZone(ProfileActivity.nastycoins[a].coordinates)) {
+                ProfileActivity.collect(ProfileActivity.nastycoins[a])
+                ProfileActivity.nastycoins.removeAt(a)
+                map.removeMarker(map.markers[a])
+                displayWalletValues()
+            } else {
+                Toast.makeText(this.context, "These coins are not in a zone your team controls!", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
-    fun compareCoordinates(a : Pair<Double, Double>, b : Pair<Double, Double>): Boolean {//test if given location is in range
+    fun compareCoordinates(a: Pair<Double, Double>, b: Pair<Double, Double>): Boolean {//test if given location is in range
         if (a.first < b.first + 0.0002f && a.first > b.first - 0.0002f && a.second < b.second + 0.0002f && a.second > b.second - 0.0002f) {
             return true
         } else {
@@ -176,17 +244,44 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
         }
     }
 
+    fun checkIfValidZone(b: Pair<Double, Double>): Boolean {
+        //rows = arrayOf(55.946233, 55.9455098, 55.9447866, 55.9440634, 55.9433402, 55.942617)
+        //columns = arrayOf(-3.192473, -3.1908422, -3.1892114, -3.1875806, -3.1859498, -3.184319)
+        for (i in 0..4) {
+            if (b.second < rows[i] && b.second >= rows[i + 1]) {
+                for (k in 0..4) {
+                    if (b.first > columns[k] && b.first <= columns[k + 1]) {
+                        if (cbs.contains(map.polygons[i * 5 + k].fillColor)) {
+                            if(ProfileActivity.team == 1) {
+                                return true
+                            }else{
+                                return false
+                            }
+                        } else {
+                            if(ProfileActivity.team == 0) {
+                                return true
+                            }else{
+                                return false
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
     //Location, Map
-    private fun setCameraPosition(location: Location){
+    private fun setCameraPosition(location: Location) {
         map.animateCamera(CameraUpdateFactory.newLatLng(LatLng(location.latitude, location.longitude)))
     }
 
-    private fun enableLocation(){
-        if (PermissionsManager.areLocationPermissionsGranted(this.context)){
+    private fun enableLocation() {
+        if (PermissionsManager.areLocationPermissionsGranted(this.context)) {
             Log.d(t, "Permissions granted")
             initLocationEngine()
             initLocationLayer()
-        }else{
+        } else {
             Log.d(t, "Permissions denied")
             permissionsManager = PermissionsManager(this)
             permissionsManager.requestLocationPermissions(this.activity)
@@ -196,7 +291,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
     @SuppressWarnings("MissingPermission")
     override fun onStart() {
         super.onStart()
-        if(PermissionsManager.areLocationPermissionsGranted(this.context)){
+        if (PermissionsManager.areLocationPermissionsGranted(this.context)) {
             locationEngine?.requestLocationUpdates()
             locationLayerPlugin?.onStart()
         }
@@ -248,7 +343,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
     }
 
     override fun onLocationChanged(location: Location?) {
-        location?.let{
+        location?.let {
             setCameraPosition(location)
             checkForCoin(location)
         }
@@ -256,9 +351,9 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
 
     override fun onPermissionResult(granted: Boolean) {
         Log.d(t, "[onPermissionResult] granted == $granted")
-        if(granted){
+        if (granted) {
             enableLocation()
-        }else{
+        } else {
             Toast.makeText(context, "Let me know where you are. Hide and seek is not my game.", Toast.LENGTH_LONG).show()
         }
     }
@@ -269,7 +364,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
     }
 
     @SuppressWarnings("MissingPermission")
-    private fun initLocationEngine(){
+    private fun initLocationEngine() {
         locationEngine = LocationEngineProvider(this.context).obtainBestLocationEngineAvailable()
         locationEngine?.apply {
             interval = 5000
@@ -278,31 +373,32 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
             activate()
         }
         val lastLocation = locationEngine?.lastLocation
-        if(lastLocation != null){
+        if (lastLocation != null) {
             setCameraPosition(lastLocation)
-        }else{
+        } else {
             locationEngine?.addLocationEngineListener(this)
         }
     }
 
     @SuppressWarnings("MissingPermission")
-    private fun initLocationLayer(){
+    private fun initLocationLayer() {
         locationLayerPlugin = LocationLayerPlugin(mapView, map, locationEngine)
-        locationLayerPlugin?.apply{
+        locationLayerPlugin?.apply {
             setLocationLayerEnabled(true)
             cameraMode = CameraMode.TRACKING
             renderMode = RenderMode.NORMAL
         }
     }
-    inner class LatLngEvaluator : TypeEvaluator<LatLng> {
-    // Method is used to interpolate the marker animation.
 
-    private var latLng : LatLng = LatLng()
+    inner class LatLngEvaluator : TypeEvaluator<LatLng> {
+        // Method is used to interpolate the marker animation.
+
+        private var latLng: LatLng = LatLng()
 
         override fun evaluate(fraction: Float, startValue: LatLng?, endValue: LatLng?): LatLng {
             latLng.setLatitude(startValue!!.getLatitude() + ((endValue!!.getLatitude() - startValue.getLatitude()) * fraction))
             latLng.setLongitude(startValue.getLongitude() + ((endValue.getLongitude() - startValue.getLongitude()) * fraction))
-            if(latLng.latitude < lastLocation!!.latitude + 0.0002f && latLng.latitude > lastLocation!!.latitude - 0.0002f && latLng.longitude > lastLocation!!.longitude - 0.0002f && latLng.longitude < lastLocation!!.longitude + 0.0002f){
+            if (latLng.latitude < lastLocation!!.latitude + 0.0002f && latLng.latitude > lastLocation!!.latitude - 0.0002f && latLng.longitude > lastLocation!!.longitude - 0.0002f && latLng.longitude < lastLocation!!.longitude + 0.0002f) {
                 markerAnimator?.end()
                 map.removeMarker(marker!!)
                 ProfileActivity.catchMovingSac()
@@ -312,6 +408,6 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener{
                 SubFragmentEvents.eventAvailability = false
             }
             return latLng
+        }
     }
-  }
 }

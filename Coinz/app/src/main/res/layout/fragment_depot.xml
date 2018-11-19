@@ -66,8 +66,7 @@
             <ImageView
                 android:id="@+id/display_profile_pic"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_height="match_parent" />
             <LinearLayout
                 android:layout_margin="3dp"
                 android:orientation="vertical"
@@ -82,15 +81,20 @@
                     android:layout_weight="1">
 
                     <ImageView
+                        android:id="@+id/team_logo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_perm_identity" />
+                        android:src="@mipmap/goldcreeper" />
 
                     <TextView
                         android:id="@+id/display_basic_prof"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="15pt"
+                        android:layout_gravity="center_vertical"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="18sp"
+                        app:autoSizeMaxTextSize="100sp"
+                        app:autoSizeStepGranularity="2sp"
                         android:textColor="@color/white"/>
                 </LinearLayout>
                 <LinearLayout
@@ -106,7 +110,11 @@
                         android:id="@+id/gold_display"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="15pt"
+                        android:layout_gravity="center_vertical"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="18sp"
+                        app:autoSizeMaxTextSize="100sp"
+                        app:autoSizeStepGranularity="2sp"
                         android:textColor="@color/white"/>
                 </LinearLayout>
             </LinearLayout>

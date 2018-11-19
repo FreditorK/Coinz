@@ -56,6 +56,11 @@
                 android:inputType="textPassword"
                 android:paddingBottom="15dp"
                 android:textColorHint="@color/colorAccent"/>
+            <Spinner
+                android:id="@+id/team_spinner"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:spinnerMode="dropdown"/>
             <Button
                 android:id="@+id/sign_up_button"
                 android:layout_width="match_parent"
