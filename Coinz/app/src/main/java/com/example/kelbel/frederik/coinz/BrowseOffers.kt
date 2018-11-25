@@ -3,58 +3,52 @@ package com.example.kelbel.frederik.coinz
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
-import android.opengl.Visibility
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.support.annotation.DrawableRes
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import kotlinx.android.synthetic.main.list_item.view.*
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.support.annotation.NonNull
 import android.util.Log
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.google.firebase.firestore.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import android.support.v4.content.ContextCompat
-import android.view.Gravity
 import android.widget.*
-import kotlin.coroutines.experimental.coroutineContext
-import com.ebanx.swipebtn.OnActiveListener
-import com.ebanx.swipebtn.OnStateChangeListener
 import com.ebanx.swipebtn.SwipeButton
 import com.google.firebase.auth.FirebaseAuth
 
 
-class Browse_Offers : AppCompatActivity() {
+class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold for coins, coin messaging
 
-    private lateinit var back_button: Button
-    private lateinit var current_gold: TextView
+    private lateinit var backbutton: Button//go back to depot
+    private lateinit var currentgold: TextView//displays your gold
 
     private lateinit var mRecyclerView: RecyclerView
     private var fRecyclerAdapter: FirestoreRecyclerAdapter<TradeOffer, TradeOfferHolder>? = null
 
-    private lateinit var db: Query
-    var offerList = mutableListOf<TradeOffer>()
+    private lateinit var db: Query//query to retrieve offers
+    var offerList = mutableListOf<TradeOffer>()//list of offers
     private var firestoreListener: ListenerRegistration? = null
+
+    private lateinit var filter: String//filters by username
+    private var bool: Boolean = false//true if filter == ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.browse_offers)
 
         mRecyclerView = findViewById(R.id.rec_list_view)
-        back_button = findViewById(R.id.back_button)
-        current_gold = findViewById(R.id.current_gold)
-        current_gold.text = ProfileActivity.gold.toString()
-        back_button.setOnClickListener{
-            val i = Intent(applicationContext, ProfileActivity :: class.java)
-            i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+        backbutton = findViewById(R.id.back_button)
+        currentgold = findViewById(R.id.current_gold)
+        currentgold.text = ProfileActivity.gold.toString()
+        filter = intent.getStringExtra("filter")//get username filter
+
+        backbutton.setOnClickListener {
+            val i = Intent(applicationContext, ProfileActivity::class.java)
+            i.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
             startActivityIfNeeded(i, 0)
             finish()
         }
@@ -65,7 +59,7 @@ class Browse_Offers : AppCompatActivity() {
 
         loadOffers()
 
-        firestoreListener = db
+        firestoreListener = db//listens for new or executed offers
                 .addSnapshotListener(EventListener { documentSnapshots, e ->
                     if (e != null) {
                         Log.e("Browse_Offers", "Listen failed!", e)
@@ -76,34 +70,39 @@ class Browse_Offers : AppCompatActivity() {
 
                     if (documentSnapshots != null) {
                         for (doc in documentSnapshots) {
-                                val offer = TradeOffer()
-                                offer.id = doc.reference
-                                offer.user = doc.get("user").toString()
-                                offer.gold = doc.get("gold").toString().toDouble()
-                                val gson = Gson()
-                                val nastyCoins = gson.fromJson<ArrayList<NastyCoin>>(doc.getString("nastycoins"), object : TypeToken<ArrayList<NastyCoin>>() {}.type)
-                                offer.children = ArrayList()
-                                for (n in nastyCoins) {
-                                    offer.worth += (n.value * getCurrencyValue(n.currency))
-                                    val s = SubTradeOffer()
-                                    s.id = n.id
-                                    s.currency = n.currency
-                                    s.value = n.value.toDouble()
-                                    s.picRef = resources.getIdentifier(n.currency + n.marker_symbol, "mipmap", packageName)
-                                    s.marker_symbol = n.marker_symbol
-                                    s.coordinates = n.coordinates
-                                    offer.children?.add(s)
-                                }
-                                offerList.add(offer)
+                            //retrieve offer, suboffer(coins in offer) details
+                            val offer = TradeOffer()
+                            offer.id = doc.reference
+                            offer.user = doc.get("user").toString()
+                            offer.gold = doc.get("gold").toString().toDouble()
+                            val gson = Gson()
+                            val nastyCoins = gson.fromJson<ArrayList<NastyCoin>>(doc.getString("nastycoins"), object : TypeToken<ArrayList<NastyCoin>>() {}.type)
+                            offer.children = ArrayList()
+                            for (n in nastyCoins) {
+                                offer.worth += (n.value * getCurrencyValue(n.currency))
+                                val s = SubTradeOffer()
+                                s.id = n.id
+                                s.currency = n.currency
+                                s.value = n.value.toDouble()
+                                s.picRef = resources.getIdentifier(n.currency + n.marker_symbol, "mipmap", packageName)
+                                s.marker_symbol = n.marker_symbol
+                                s.coordinates = n.coordinates
+                                offer.children?.add(s)
+                            }
+                            offerList.add(offer)
                         }
                     }
 
                     fRecyclerAdapter!!.notifyDataSetChanged()
                     mRecyclerView.adapter = fRecyclerAdapter
                 })
+
+        if (filter == "") {
+            bool = true
+        }
     }
 
-    private fun getCurrencyValue(s: String): Double {
+    private fun getCurrencyValue(s: String): Double {//return current exchange rates for coins
         var d = 0.0
         when (s) {
             "shil" -> {
@@ -122,53 +121,59 @@ class Browse_Offers : AppCompatActivity() {
         return d
     }
 
+    private fun roundToDecimals(number: Double, numDecimalPlaces: Int): Double {//rounds to given number of decimal places
+        val factor = Math.pow(10.0, numDecimalPlaces.toDouble())
+        return Math.round(number * factor) / factor
+    }
+
     private fun loadOffers() {
 
-        val user = FirebaseAuth.getInstance().currentUser?.email
+        val user = FirebaseAuth.getInstance().currentUser?.email//get current user
         val options = FirestoreRecyclerOptions.Builder<TradeOffer>()
                 .setQuery(db, TradeOffer::class.java)
                 .build()
         fRecyclerAdapter = object : FirestoreRecyclerAdapter<TradeOffer, TradeOfferHolder>(options) {
             override fun onBindViewHolder(holder: TradeOfferHolder, position: Int, offer: TradeOffer) {
-                if(offerList.size > 0) {
-                    if (offerList[position].user != user) {
+                if (offerList.size > 0) {
+                    if (offerList[position].user != user && (offerList[position].user?.substringBefore('@') == filter || bool)) {//filter by given username filter and exclude offers with own username
                         val o = offerList[position]
+                        //fill in viewholder
                         holder.user?.text = "Offered by: " + o.user?.substringBefore('@')
-                        holder.gold?.text = "Price: " + o.gold.toString()
-                        holder.worth?.text = "Current worth: " + o.worth.toString()
-                        holder.swipeButton?.setOnStateChangeListener(object : OnStateChangeListener {
-                            override fun onStateChange(active: Boolean) {
-                                if (o.gold!! <= ProfileActivity.gold) {
-                                    executeOrder66(o)
-                                } else {
-                                    holder.swipeButton?.setEnabledDrawable(getDrawable(R.mipmap.denied))
-                                    Toast.makeText(baseContext, "Not enough gold in depot!", Toast.LENGTH_SHORT).show()
-                                }
+                        holder.gold?.text = "Price: " + roundToDecimals(o.gold!!, 1).toString()
+                        holder.worth?.text = "Current worth: " + roundToDecimals(o.worth, 1).toString()
+                        holder.swipeButton?.setOnStateChangeListener {
+                            if (o.gold!! <= ProfileActivity.gold) {//execute trade
+                                executeOrder66(o)
+                            } else {//not enough gold to execute
+                                holder.swipeButton?.setEnabledDrawable(getDrawable(R.mipmap.denied))
+                                Toast.makeText(baseContext, "Not enough gold in depot!", Toast.LENGTH_SHORT).show()
                             }
-                        })
-                        val noOfChildTextViews = holder.child_items?.childCount
+                        }
+                        //add coins to expandable list in layout
+                        val noOfChildTextViews = holder.childitems?.childCount
                         val noOfChild = o.children!!.size
                         if (noOfChild < noOfChildTextViews!!) {
                             for (index in noOfChild until noOfChildTextViews) {
-                                val currentView = holder.child_items?.getChildAt(index) as LinearLayout
+                                val currentView = holder.childitems?.getChildAt(index) as LinearLayout
                                 currentView.visibility = View.GONE
                             }
                         }
                         for (ViewIndex in 0 until noOfChild) {
-                            val currentView = holder.child_items?.getChildAt(ViewIndex) as LinearLayout
+                            val currentView = holder.childitems?.getChildAt(ViewIndex) as LinearLayout
                             (currentView.getChildAt(0) as ImageView).setImageResource(o.children?.get(ViewIndex)?.picRef!!)
                             val sublayout = currentView.getChildAt(1) as LinearLayout
                             (sublayout.getChildAt(0) as TextView).text = o.children?.get(ViewIndex)?.id
                             (sublayout.getChildAt(1) as TextView).text = "Value: " + o.children?.get(ViewIndex)?.value.toString()
                         }
-                    }else{
+                    } else {
+                        //do not display if filtered out
                         holder.itemView.visibility = View.GONE
                         holder.itemView.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0)
                     }
                 }
             }
 
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TradeOfferHolder {
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TradeOfferHolder {//creates viewholder
                 val view = LayoutInflater.from(parent.context).inflate(R.layout.browse_item, parent, false)
                 return TradeOfferHolder(view, offerList, baseContext)
             }
@@ -178,34 +183,39 @@ class Browse_Offers : AppCompatActivity() {
                 Log.e("error", e.message)
             }
 
-            fun executeOrder66(offer : TradeOffer){
+            fun executeOrder66(offer: TradeOffer) {//executes trade
                 FirebaseFirestore.getInstance().collection("users").document(offer.user.toString())
                         .get()
                         .addOnSuccessListener {
+                            //update gold of trade offerer
                             val currentGold = it.getDouble("gold")
-                            Log.d("goldig", offer.gold.toString() + "/" + currentGold.toString())
                             FirebaseFirestore.getInstance().collection("users").document(offer.user.toString())
                                     .update("gold", offer.gold!! + currentGold!!)
-                                    .addOnSuccessListener { it2 ->
+                                    .addOnSuccessListener {
                                         offer.id?.delete()!!
-                                                .addOnSuccessListener{it3 ->
+                                                .addOnSuccessListener {
                                                     Toast.makeText(applicationContext, "Trade executed", Toast.LENGTH_SHORT).show()
-                                                    for(n in offer.children!!){
-                                                        ProfileActivity.collect(NastyCoin(n.id!!, n.value!!.toFloat(), n.currency!!, n.marker_symbol!!, n.coordinates!!))
+                                                    for (n in offer.children!!) {//retrieve coins and mark them as traded so that they can be exchanged even when exchanged 25 coins already
+                                                        if (n.id!!.matches(Regex(".*TRADED"))) {
+                                                            ProfileActivity.collect(NastyCoin(n.id!!, n.value!!.toFloat(), n.currency!!, n.marker_symbol!!, n.coordinates!!))
+                                                        } else {
+                                                            ProfileActivity.collect(NastyCoin(n.id!! + "TRADED", n.value!!.toFloat(), n.currency!!, n.marker_symbol!!, n.coordinates!!))
+                                                        }
                                                     }
-                                                    ProfileActivity.gold -= offer.gold!!.toFloat()
-                                                    current_gold.text = ProfileActivity.gold.toString()
+                                                    ProfileActivity.gold -= offer.gold!!.toFloat()//decrease gold of offer acceptor
+                                                    currentgold.text = ProfileActivity.gold.toString()
                                                 }
-                                                .addOnFailureListener{
-                                                    e -> Log.w("Browse_Offers", "Error deleting offer", e)
+                                                .addOnFailureListener { e ->
+                                                    Log.w("Browse_Offers", "Error deleting offer", e)
                                                     Toast.makeText(applicationContext, "Trade could not be executed. Try again later.", Toast.LENGTH_SHORT).show()
                                                 }
                                     }
-                                    .addOnFailureListener{
-                                        e -> Log.w("Browse_Offers", "Error updating gold status", e)
-                                    }                        }
-                        .addOnFailureListener{
-                            e -> Log.w("Browse_Offers", "Error receiving gold status", e)
+                                    .addOnFailureListener { e ->
+                                        Log.w("Browse_Offers", "Error updating gold status", e)
+                                    }
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("Browse_Offers", "Error receiving gold status", e)
                         }
             }
         }
@@ -215,22 +225,23 @@ class Browse_Offers : AppCompatActivity() {
     }
 
     class TradeOfferHolder(itemView: View, offerList: MutableList<TradeOffer>, context: Context) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
-        var expand: ImageView? = null
+        //Viewholder for the offers
+        private var expand: ImageView? = null//expand arrow
         var swipeButton: SwipeButton? = null
-        var user: TextView? = null
-        var gold: TextView? = null
-        var worth: TextView? = null
-        var child_items: LinearLayout? = null
+        var user: TextView? = null//offerer
+        var gold: TextView? = null//price
+        var worth: TextView? = null//current worth of the coins
+        var childitems: LinearLayout? = null//contains coins in offer
 
         init {
-            if(offerList.size > 0) {
+            if (offerList.size > 0) {
                 expand = itemView.findViewById(R.id.expand_coins)
                 swipeButton = itemView.findViewById(R.id.swipe_btn)
                 user = itemView.findViewById(R.id.listview_item_title)
                 gold = itemView.findViewById(R.id.listview_item_short_description)
                 worth = itemView.findViewById(R.id.worth)
-                child_items = itemView.findViewById(R.id.child_items)
-                child_items?.visibility = View.GONE
+                childitems = itemView.findViewById(R.id.child_items)
+                childitems?.visibility = View.GONE
                 var intMaxNoOfChild = 0
                 for (index in 0 until offerList.size) {
                     val intMaxSizeTemp = offerList[index].children!!.size
@@ -257,18 +268,18 @@ class Browse_Offers : AppCompatActivity() {
                     linearlay.addView(imageView)
                     linearlay.addView(linearlay2)
                     val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-                    child_items?.addView(linearlay, layoutParams)
+                    childitems?.addView(linearlay, layoutParams)
                 }
                 expand?.setOnClickListener(this)
             }
         }
 
-        override fun onClick(view: View) {
-            if (child_items?.visibility == View.VISIBLE) {
-                child_items?.visibility = View.GONE
+        override fun onClick(view: View) {//changes expand arrow to unexpand and reverse wise
+            if (childitems?.visibility == View.VISIBLE) {
+                childitems?.visibility = View.GONE
                 (view as ImageView).setImageResource(R.drawable.ic_keyboard_arrow_up)
             } else {
-                child_items?.visibility = View.VISIBLE
+                childitems?.visibility = View.VISIBLE
                 (view as ImageView).setImageResource(R.drawable.ic_keyboard_arrow_down)
             }
         }
@@ -277,19 +288,16 @@ class Browse_Offers : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-
         firestoreListener!!.remove()
     }
 
     public override fun onStart() {
         super.onStart()
-
         fRecyclerAdapter!!.startListening()
     }
 
     public override fun onStop() {
         super.onStop()
-
         fRecyclerAdapter!!.stopListening()
     }
 

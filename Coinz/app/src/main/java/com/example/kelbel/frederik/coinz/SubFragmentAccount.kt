@@ -1,24 +1,23 @@
 package com.example.kelbel.frederik.coinz
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.*
 import android.view.ViewGroup
-import android.graphics.drawable.Drawable
-import android.util.Log
 import android.widget.*
 
 
-class SubFragmentAccount : Fragment(){
+class SubFragmentAccount : Fragment() {//fragment visible on opening
 
-    private lateinit var supportButton: Button
+    private lateinit var supportButton: Button//on button click open zone purchase activity (teamzone)
 
-    private var creeperbar : LinearLayout? = null
-    private var carverbar : LinearLayout? = null
+    //simple barplot of zones owned by each team
+    private var creeperbar: LinearLayout? = null
+    private var carverbar: LinearLayout? = null
 
     companion object {
+        //height of the bars
         var creepersize: Int = 0
         var carversize: Int = 0
     }
@@ -32,17 +31,13 @@ class SubFragmentAccount : Fragment(){
         supportButton = view.findViewById(R.id.support_button)
         creeperbar = view.findViewById(R.id.creeperbar)
         carverbar = view.findViewById(R.id.carverbar)
-        if(ProfileActivity.team == 1) {
+        if (ProfileActivity.team == 1) {//change color of support team button according to your current team
             supportButton.setBackgroundResource(R.color.coinBlueAccent)
         }
-        supportButton.setOnClickListener(object : View.OnClickListener{
-            override fun onClick(p0: View?) {
-                startActivity(Intent(context, TeamZone :: class.java))
-            }
-        })
+        supportButton.setOnClickListener { startActivity(Intent(context, TeamZone::class.java)) }
     }
 
-    fun updateBars(){
+    fun updateBars() {//update barplot
         val layoutParamscr = LinearLayout.LayoutParams(200, creepersize * 20)
         val layoutParamsca = LinearLayout.LayoutParams(200, carversize * 20)
         layoutParamsca.gravity = Gravity.CENTER_HORIZONTAL

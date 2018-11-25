@@ -1,32 +1,33 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!-- all listviews containing coins use this layout for their items-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
     android:layout_margin="1dp"
-    android:background="@color/colorPrimary">
-
+    android:background="@color/colorPrimary"
+    android:orientation="horizontal">
+    <!-- coin item icon-->
     <ImageView
         android:id="@+id/listview_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/coin_img"
         android:padding="10dp"
-        android:src="@mipmap/gold"/>
+        android:src="@mipmap/gold" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="7dp">
-
+        <!-- id of coin-->
         <TextView
             android:id="@+id/listview_item_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="10sp"
             android:textColor="@color/white"
+            android:textSize="12sp"
             android:textStyle="bold" />
-
+        <!-- values of coin-->
         <TextView
             android:id="@+id/listview_item_short_description"
             android:layout_width="wrap_content"

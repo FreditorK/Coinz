@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!-- layout of how an offer is displayed in browseOffers -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="1dp">
 
@@ -12,48 +12,50 @@
         android:background="@color/colorPrimary"
         android:gravity="bottom"
         android:orientation="vertical">
-
+        <!-- displays username of user offering -->
         <TextView
             android:id="@+id/listview_item_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            android:background="@color/colorPrimaryDark"
             android:textColor="@color/white"
             android:textSize="12sp"
-            android:textStyle="bold"
-            android:background="@color/colorPrimaryDark"
-            android:layout_margin="1dp"/>
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
+            <!-- red arrow up -->
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="1dp"
+                android:layout_marginStart="1dp"
                 android:background="@color/colorPrimaryDark"
+                android:contentDescription="@string/red_arrow_up"
                 android:src="@mipmap/take" />
-
+            <!-- displays price of offer -->
             <TextView
                 android:id="@+id/listview_item_short_description"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@color/colorPrimaryDark"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
-
+            <!-- green arrow down -->
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="1dp"
+                android:layout_marginStart="1dp"
                 android:background="@color/colorPrimaryDark"
+                android:contentDescription="@string/green_arrow_down"
                 android:src="@mipmap/give" />
-
+            <!-- displays current worth of coins in offer -->
             <TextView
                 android:id="@+id/worth"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@color/colorPrimaryDark"
@@ -70,25 +72,22 @@
             android:gravity="bottom"
             android:orientation="horizontal">
 
-
+            <!-- arrow up/down for expanding -->
             <ImageView
                 android:id="@+id/expand_coins"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="@string/arrow_up"
                 android:src="@drawable/ic_keyboard_arrow_up" />
-
+            <!-- swipe button to accept offer -->
             <com.ebanx.swipebtn.SwipeButton
                 android:id="@+id/swipe_btn"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginStart="3dp"
                 android:layout_marginEnd="3dp"
-                app:inner_text="ACCEPT"
-                app:inner_text_color="@android:color/white"
-                app:inner_text_size="12sp"
-                app:inner_text_top_padding="3dp"
-                app:inner_text_bottom_padding="3dp"
-                app:inner_text_background="@drawable/shape_rounded"
+                app:button_background="@drawable/shape_button"
+                app:button_bottom_padding="3dp"
                 app:button_image_disabled="@mipmap/enabled"
                 app:button_image_enabled="@mipmap/disabled"
                 app:button_image_height="30dp"
@@ -96,16 +95,19 @@
                 app:button_left_padding="3dp"
                 app:button_right_padding="5dp"
                 app:button_top_padding="3dp"
-                app:button_bottom_padding="3dp"
-                app:button_background="@drawable/shape_button"
+                app:has_activate_state="true"
                 app:initial_state="disabled"
-                app:has_activate_state="true">
-            </com.ebanx.swipebtn.SwipeButton>
+                app:inner_text="ACCEPT"
+                app:inner_text_background="@drawable/shape_rounded"
+                app:inner_text_bottom_padding="3dp"
+                app:inner_text_color="@android:color/white"
+                app:inner_text_size="12sp"
+                app:inner_text_top_padding="3dp" />
 
         </LinearLayout>
 
     </LinearLayout>
-
+    <!-- displays all coins in offer on expansion-->
     <LinearLayout
         android:id="@+id/child_items"
         android:layout_width="match_parent"

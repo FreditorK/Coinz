@@ -1,100 +1,110 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!-- depot tab opens up in this subtab-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="2dp"
     android:background="@color/colorPrimary"
     android:gravity="center_horizontal"
     android:orientation="vertical">
-
+    <!-- text: The following displays the zone amounts owned by every team-->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Zone-Balance"
+        android:layout_margin="1dp"
+        android:background="@color/colorPrimaryDark"
+        android:text="@string/zone_balance"
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="25sp"
-        android:background="@color/colorPrimaryDark"
-        android:layout_margin="1dp"/>
+        android:textSize="25sp" />
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:baselineAligned="false"
         android:gravity="bottom"
-        android:orientation="horizontal"
-        android:layout_weight="1">
+        android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="1dp"
             android:layout_weight="1"
+            android:background="@color/colorPrimaryDark"
             android:gravity="bottom"
             android:orientation="vertical"
-            android:layout_margin="1dp"
-            android:background="@color/colorPrimaryDark">
+            tools:ignore="NestedWeights"><!-- this nested weight is necessary, it does not have any signicant influence on performance here-->
+            <!-- team icon-->
             <ImageView
-                android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_margin="3dp"
+                android:contentDescription="@string/team_icon"
                 android:src="@mipmap/goldcreeper" />
+            <!-- bar in bar plot-->
             <LinearLayout
                 android:id="@+id/creeperbar"
-                android:orientation="vertical"
-                android:layout_gravity="center"
                 android:layout_width="100dp"
                 android:layout_height="0dp"
-                android:background="@color/coinRedAccent"
-                android:layout_marginBottom="10dp"/>
-            <TextView
                 android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:background="@color/coinRedAccent"
+                android:orientation="vertical" />
+            <!-- team name-->
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Gold Creepers"
+                android:layout_gravity="center"
+                android:text="@string/gold_creepers"
                 android:textColor="@color/white"
                 android:textSize="20sp" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="bottom"
-            android:orientation="vertical"
             android:layout_margin="1dp"
-            android:background="@color/colorPrimaryDark">
-
+            android:layout_weight="1"
+            android:background="@color/colorPrimaryDark"
+            android:gravity="bottom"
+            android:orientation="vertical">
+            <!-- team icon-->
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_margin="3dp"
-                android:src="@mipmap/coincarver"
-                android:layout_gravity="center"/>
-
+                android:contentDescription="@string/team_icon"
+                android:src="@mipmap/coincarver" />
+            <!-- bar in bar plot-->
             <LinearLayout
                 android:id="@+id/carverbar"
-                android:orientation="vertical"
                 android:layout_width="100dp"
                 android:layout_height="0dp"
-                android:background="@color/coinBlueAccent"
+                android:layout_gravity="center"
                 android:layout_marginBottom="10dp"
-                android:layout_gravity="center"/>
-
+                android:background="@color/coinBlueAccent"
+                android:orientation="vertical" />
+            <!-- team name-->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Coin Carvers"
+                android:layout_gravity="center"
+                android:text="@string/coin_carvers"
                 android:textColor="@color/white"
-                android:textSize="20sp"
-                android:layout_gravity="center"/>
+                android:textSize="20sp" />
         </LinearLayout>
     </LinearLayout>
+    <!-- button that links to team zone activity-->
     <Button
         android:id="@+id/support_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Support Team"
-        android:textColor="@color/white"
-        android:background="@color/coinRedAccent"
         android:layout_gravity="center"
-        android:textSize="16sp"
-        android:layout_margin="2dp"/>
+        android:layout_margin="2dp"
+        android:background="@color/coinRedAccent"
+        android:text="@string/support_team"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
 </LinearLayout>

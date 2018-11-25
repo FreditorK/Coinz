@@ -1,31 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!-- settings tab-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!-- Displays username and the identity icon-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_margin="1dp"
-        android:orientation="horizontal"
-        android:background="@color/colorPrimary">
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_perm_identity"
-            android:background="@color/colorPrimary"/>
+            android:background="@color/colorPrimary"
+            android:contentDescription="@string/username"
+            android:src="@drawable/ic_perm_identity" />
 
         <TextView
             android:id="@+id/user_settings"
-            android:text="user"
-            android:layout_marginLeft="10dp"
-            android:gravity="center_vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:gravity="center_vertical"
+            android:text="@string/user"
             android:textColor="@color/white"
-            android:textSize="20sp"/>
+            android:textSize="20sp" />
     </LinearLayout>
 
     <RelativeLayout
@@ -33,31 +36,34 @@
         android:layout_height="82dp"
         android:layout_margin="1dp"
         android:background="@color/colorPrimary">
-
+        <!-- Displays profile picture-->
         <ImageView
             android:id="@+id/profile_pic"
             android:layout_width="82dp"
             android:layout_height="match_parent"
-            android:layout_marginLeft="5dp"
-            android:background="@color/whiteTransparent" />
-
+            android:layout_marginStart="5dp"
+            android:background="@color/whiteTransparent"
+            android:contentDescription="@string/profile_picture" />
+        <!-- Tells you to tap on picture to select a new one-->
         <TextView
             android:id="@+id/text_view_prof"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:layout_toRightOf="@+id/profile_pic"
-            android:text="Tap on picture to change it"
+            android:layout_toEndOf="@+id/profile_pic"
+            android:text="@string/tap_on_picture_to_change_it"
             android:textColor="@color/white" />
-
+        <!-- click to save profile picture-->
         <Button
             android:id="@+id/save_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/text_view_prof"
             android:layout_margin="5dp"
-            android:layout_toRightOf="@id/profile_pic"
-            android:text="save" />
+            android:layout_toEndOf="@id/profile_pic"
+            android:background="@color/colorPrimaryDark"
+            android:text="@string/save"
+            android:textColor="@color/white" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -65,98 +71,118 @@
         android:layout_height="142dp"
         android:layout_margin="1dp"
         android:background="@color/colorPrimary">
-
+        <!-- lock icon-->
         <ImageView
             android:id="@+id/lock"
             android:layout_width="82dp"
             android:layout_height="match_parent"
-            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:contentDescription="@string/lock_icon"
             android:src="@drawable/ic_action_lock_closed" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="50dp"
-            android:layout_toRightOf="@+id/lock"
+            android:layout_marginEnd="50dp"
+            android:layout_toEndOf="@+id/lock"
             android:orientation="vertical">
-
+            <!-- enter old password here to change it-->
             <EditText
                 android:id="@+id/text_view_lock"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="old password"
+                android:hint="@string/old_password"
+                android:inputType="text"
                 android:textColor="@color/white"
-                android:textColorHint="@color/whiteTransparent" />
-
+                android:textColorHint="@color/whiteTransparent"
+                tools:ignore="Autofill" /><!-- autofill is only supported for oreo -->
+            <!-- enter new password here to change it-->
             <EditText
                 android:id="@+id/text_view_lock2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="new password"
+                android:hint="@string/new_password"
+                android:inputType="text"
                 android:textColor="@color/white"
-                android:textColorHint="@color/whiteTransparent" />
-
+                android:textColorHint="@color/whiteTransparent"
+                tools:ignore="Autofill" /><!-- autofill is only supported for oreo -->
+            <!-- confirm intention to change password-->
             <Button
                 android:id="@+id/save_lock"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="set new password" />
+                android:layout_marginBottom="5dp"
+                android:background="@color/colorPrimaryDark"
+                android:padding="8dp"
+                android:text="@string/set_new_password"
+                android:textColor="@color/white" />
         </LinearLayout>
     </RelativeLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
         android:layout_margin="1dp"
+        android:background="@color/colorPrimary"
         android:orientation="vertical">
+        <!-- text: you switch teams here and app will restart after that-->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:text="Switch teams? (The app will have to restart!)"
-            android:textAlignment="center"
-            android:layout_margin="5dp"/>
-        <CheckBox
-            android:id="@+id/check_switch"
             android:layout_margin="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="I understand that this will halve the amount of gold I currently have."
-            android:shadowColor="@color/white"
-            android:textColor="@color/white"/>
+            android:text="@string/switch_teams_app_will_restart"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="5dp">
+            android:layout_margin="5dp"
+            android:orientation="horizontal">
+            <!-- logo of current team-->
             <ImageView
                 android:id="@+id/current_team"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@mipmap/goldcreeper"/>
-            <Button
-                android:layout_gravity="center_horizontal"
-                android:id="@+id/switch_team"
                 android:layout_width="120dp"
-                android:layout_height="100dp"
-                android:text="switch team"
-                android:background="@color/colorAccent"
-                android:layout_marginBottom="10dp"/>
-            <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@drawable/switchteam"/>
+                android:layout_height="120dp"
+                android:contentDescription="@string/currenteam"
+                android:src="@mipmap/goldcreeper" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <!-- accept that your gold in the bank is going to be halved-->
+                <CheckBox
+                    android:id="@+id/check_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="5dp"
+                    android:shadowColor="@color/white"
+                    android:text="@string/i_understand_that_this_will_halve_the_amount_of_gold_i_currently_have"
+                    android:textColor="@color/white" />
+                <!-- confirm intention to switch team-->
+                <Button
+                    android:id="@+id/switch_team"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_margin="5dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@color/colorPrimaryDark"
+                    android:text="@string/switch_team"
+                    android:textColor="@color/white" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-    <LinearLayout
+    <!-- displaying credits-->
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="1dp"
-        android:orientation="horizontal"
-        android:background="@color/colorPrimary">
-
-    </LinearLayout>
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical"
+        android:padding="5dp"
+        android:text="@string/developed_by_frederik_kelbel"
+        android:textColor="@color/white" />
 </LinearLayout>

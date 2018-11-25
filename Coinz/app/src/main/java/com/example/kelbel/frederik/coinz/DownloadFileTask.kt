@@ -1,14 +1,11 @@
 package com.example.kelbel.frederik.coinz
 
-import android.content.Context
 import android.os.AsyncTask
-import com.google.gson.Gson
 import org.apache.commons.io.IOUtils
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 import java.io.InputStream
-import java.io.OutputStreamWriter
 import java.io.StringWriter
 import java.net.HttpURLConnection
 import java.net.URL
@@ -17,28 +14,12 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class DownloadFileTask(private val c: Context?) : AsyncTask<String, Void, String>() {
+class DownloadFileTask : AsyncTask<String, Void, String>() {//downloads current exchange rate and current map
 
     companion object {
-        fun loadGeoJson(context: Context) {
-            val stream: InputStream = context.openFileInput("coinzmap.geojson")
-            val writer = StringWriter()
-            IOUtils.copy(stream, writer, "UTF-8")
-            val json = JSONObject(writer.toString())
-            if(ProfileActivity.coinExchangeRates == null){
-                ProfileActivity.coinExchangeRates?.add(retrieveCoinExchangerates(json))
-            }else{
-                if(ProfileActivity.coinExchangeRates!!.size == 0){
-                    ProfileActivity.coinExchangeRates?.add(retrieveCoinExchangerates(json))
-                }else {
-                    ProfileActivity.coinExchangeRates!![0] = retrieveCoinExchangerates(json)
-                }
-            }
-            ProfileActivity.nastycoins = retrieveCoins(json)
-        }
 
-        fun retrieveCoinExchangerates(json : JSONObject) : CoinExchangeRates{
-            val values : CoinExchangeRates = CoinExchangeRates(0f, 0f, 0f, 0f, Date())
+        fun retrieveCoinExchangerates(json: JSONObject): CoinExchangeRates {//retrieves exchange rates
+            val values = CoinExchangeRates(0f, 0f, 0f, 0f, Date())
             values.SHIL = json.getJSONObject("rates").getString("SHIL").toFloat()
             values.DOLR = json.getJSONObject("rates").getString("DOLR").toFloat()
             values.QUID = json.getJSONObject("rates").getString("QUID").toFloat()
@@ -47,10 +28,10 @@ class DownloadFileTask(private val c: Context?) : AsyncTask<String, Void, String
             return values
         }
 
-        fun retrieveCoins(json: JSONObject) : ArrayList<NastyCoin> {
-            val nastycoins: ArrayList<NastyCoin> = ArrayList<NastyCoin>()
-            val jsonarray : JSONArray = json.getJSONArray("features")
-            for(i in 0..49){
+        fun retrieveCoins(json: JSONObject): ArrayList<NastyCoin> {//retrieves all coins on the map
+            val nastycoins: ArrayList<NastyCoin> = ArrayList()
+            val jsonarray: JSONArray = json.getJSONArray("features")
+            for (i in 0..49) {
                 val n = NastyCoin("", 0f, "", "", Pair(0.0, 0.0))
                 val k = jsonarray.getJSONObject(i)
                 n.id = k.getJSONObject("properties").getString("id")
@@ -63,31 +44,30 @@ class DownloadFileTask(private val c: Context?) : AsyncTask<String, Void, String
             return nastycoins
         }
 
-        fun stringToCoordinates(s : String) : Pair<Double, Double>{
+        private fun stringToCoordinates(s: String): Pair<Double, Double> {//converts coordinate string to double coords
             val regex = "-?[0-9]*\\.[0-9]*".toRegex()
-            val ss : Sequence<MatchResult> = regex.findAll(s)
-            val ss1 : String = ss.first().value
-            val ss2 : String = ss.last().value
-            return Pair<Double, Double>(ss1.toDouble(), ss2.toDouble())
+            val ss: Sequence<MatchResult> = regex.findAll(s)
+            val ss1: String = ss.first().value
+            val ss2: String = ss.last().value
+            return Pair(ss1.toDouble(), ss2.toDouble())
         }
     }
 
     override fun doInBackground(vararg p0: String): String = try {
-            loadFileFromNetwork(p0[0])
-        } catch(e: IOException){
-            "Unable to load content. Check your network connection"
-        }
+        loadFileFromNetwork(p0[0])
+    } catch (e: IOException) {
+        "Unable to load content. Check your network connection"
+    }
 
-    private fun loadFileFromNetwork(urlString: String) : String {
+    private fun loadFileFromNetwork(urlString: String): String {
         val stream: InputStream = downloadUrl(urlString)
         val writer = StringWriter()
         IOUtils.copy(stream, writer, "UTF-8")
-        val result = writer.toString()
-        return result
+        return writer.toString()
     }
 
     @Throws(IOException::class)
-    private fun downloadUrl(urlString: String): InputStream{
+    private fun downloadUrl(urlString: String): InputStream {
         val url = URL(urlString)
         val conn = url.openConnection() as HttpURLConnection
         conn.readTimeout = 10000
@@ -103,8 +83,8 @@ class DownloadFileTask(private val c: Context?) : AsyncTask<String, Void, String
         doStuff(result)
     }
 
-    fun doStuff(s : String){
-        val json  = JSONObject(s)
+    private fun doStuff(s: String) {
+        val json = JSONObject(s)
 
         ProfileActivity.nastycoins = retrieveCoins(json)
 
@@ -112,7 +92,8 @@ class DownloadFileTask(private val c: Context?) : AsyncTask<String, Void, String
         val todaysExchangeRate = retrieveCoinExchangerates(json)
         ProfileActivity.coinExchangeRates!!.add(todaysExchangeRate)
 
-        DownloadExchangeRates(c).execute("http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 86400000L)) + "/coinzmap.geojson",
+        //call additional async task for graphs in exchange tab
+        DownloadExchangeRates().execute("http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 86400000L)) + "/coinzmap.geojson",
                 "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 172800000L)) + "/coinzmap.geojson",
                 "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 259200000L)) + "/coinzmap.geojson",
                 "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 345600000L)) + "/coinzmap.geojson",

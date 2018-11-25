@@ -1,92 +1,116 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!-- this is where you start events-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_margin="2dp"
         android:background="@color/colorPrimary"
-        android:layout_margin="2dp">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:background="@color/colorPrimary"
-        android:layout_weight="1">
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@mipmap/movingsac"
-            android:background="@color/whiteTransparent"
-            android:layout_margin="1dp"/>
-        <ImageView
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal">
+            <!-- image of the moving sac you will have to follow-->
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginStart="2dp"
+                android:background="@color/colorPrimaryDark"
+                android:contentDescription="@string/movingsac"
+                android:src="@mipmap/movingsac" />
+            <!-- decoration image displaying the title of the event, hinting reference to a famous movie-->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="2dp"
+                android:background="@color/colorPrimaryDark"
+                android:contentDescription="@string/catch_me_if_you_can"
+                android:src="@drawable/catchmeifyoucan" />
+
+        </LinearLayout>
+        <!-- event description-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:background="@color/colorPrimaryDark"
+            android:padding="2dp"
+            android:text="@string/these_rats"
+            android:textColor="@color/whiteTransparent"
+            android:textSize="16sp" />
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/catchmeifyoucan"
-            android:background="@color/whiteTransparent"
-            android:layout_margin="1dp"
-            android:layout_weight="1"/>
-
-    </LinearLayout>
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:background="@color/colorPrimaryDark">
+            <!-- start event here-->
+            <com.ebanx.swipebtn.SwipeButton
+                android:id="@+id/swipe_btn2"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                app:button_background="@drawable/shape_button"
+                app:button_bottom_padding="3dp"
+                app:button_image_disabled="@mipmap/enabled"
+                app:button_image_enabled="@mipmap/disabled"
+                app:button_image_height="30dp"
+                app:button_image_width="40dp"
+                app:button_left_padding="3dp"
+                app:button_right_padding="5dp"
+                app:button_top_padding="3dp"
+                app:has_activate_state="true"
+                app:initial_state="disabled"
+                app:inner_text="Start Event"
+                app:inner_text_background="@drawable/shape_rounded"
+                app:inner_text_bottom_padding="3dp"
+                app:inner_text_color="@android:color/white"
+                app:inner_text_size="15sp"
+                app:inner_text_top_padding="3dp" />
+        </LinearLayout>
+        <!-- information display related to the event-->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="These rats are getting smarter. They are using up our coins. Are they heading for the Big Cheese or maybe some cheesy Nachos at Teviot? Who knows? Hunt them down for big coin rewards."
-            android:background="@color/whiteTransparent"
-            android:textSize="16sp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:background="@color/colorPrimaryDark"
             android:padding="2dp"
-            android:layout_margin="2dp"/>
-        <com.ebanx.swipebtn.SwipeButton
-            android:id="@+id/swipe_btn2"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginStart="3dp"
-            android:layout_marginEnd="3dp"
-            app:inner_text="Start Event"
-            app:inner_text_color="@android:color/white"
-            app:inner_text_size="15sp"
-            app:inner_text_top_padding="3dp"
-            app:inner_text_bottom_padding="3dp"
-            app:inner_text_background="@drawable/shape_rounded"
-            app:button_image_disabled="@mipmap/enabled"
-            app:button_image_enabled="@mipmap/disabled"
-            app:button_image_height="30dp"
-            app:button_image_width="40dp"
-            app:button_left_padding="3dp"
-            app:button_right_padding="5dp"
-            app:button_top_padding="3dp"
-            app:button_bottom_padding="3dp"
-            app:button_background="@drawable/shape_button"
-            app:initial_state="disabled"
-            app:has_activate_state="true">
-        </com.ebanx.swipebtn.SwipeButton>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Coins collected here bear the prefix cI in their ID."
-            android:background="@color/whiteTransparent"
+            android:text="@string/coins_collected_here"
             android:textAlignment="center"
-            android:textSize="14sp"
-            android:padding="2dp"
-            android:layout_margin="2dp"/>
+            android:textColor="@color/whiteTransparent"
+            android:textSize="14sp" />
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
         android:background="@color/colorPrimary"
-        android:layout_margin="2dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <!-- More events can be added here instead of this message-->
         <TextView
+            android:gravity="center"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="More events will follow..."
-            android:textSize="25sp"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimaryDark"
+            android:text="@string/more_events_will_follow"
             android:textAlignment="center"
-            android:textColor="@color/whiteTransparent"/>
+            android:textColor="@color/whiteTransparent"
+            android:textSize="25sp" />
 
     </LinearLayout>
 

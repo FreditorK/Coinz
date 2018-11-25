@@ -4,7 +4,8 @@ import com.google.firebase.firestore.DocumentReference
 import java.io.Serializable
 
 class TradeOffer : Serializable {
-    var id : DocumentReference? = null
+    //stores data of an offer in browseOffers
+    var id: DocumentReference? = null
     var user: String? = null
     var gold: Double? = null
     var worth: Double = 0.0

@@ -1,70 +1,75 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!-- this is where you can make a trade offer-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
+    <!-- text: Select items you want to trade-->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimaryDark"
-        android:text="Select items to trade"
+        android:text="@string/select_items_to_trade"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="20sp"
         android:textStyle="bold" />
-
+    <!-- listview displaying coins available for trade-->
     <ListView
         android:id="@+id/list_view"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"></ListView>
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_margin="1dp"
         android:background="@color/colorPrimaryDark"
-        android:orientation="horizontal"
-        android:layout_margin="1dp">
-
+        android:orientation="horizontal">
+        <!-- gold icon-->
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/gold"
             android:src="@mipmap/gold" />
-
+        <!-- enter how much gold you want for your offer here-->
         <EditText
             android:id="@+id/gold_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="@string/how_much_gold_do_you_want"
+            android:inputType="numberDecimal"
             android:textColor="@color/white"
-            android:hint="How much Gold do you want?"
             android:textColorHint="@color/whiteTransparent"
-            android:inputType="numberDecimal" />
+            tools:ignore="Autofill" /><!-- autofill is only supported for oreo -->
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:orientation="horizontal">
-
+        <!-- back to depot-->
         <Button
             android:id="@+id/back_button"
+            style=""
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="1dp"
             android:layout_weight="1"
             android:background="@color/colorPrimaryDark"
-            android:text="Cancel"
-            android:textColor="@color/white"/>
-
+            android:text="@string/cancel"
+            android:textColor="@color/white" />
+        <!-- submit your offer-->
         <Button
             android:id="@+id/submit_button"
+            style=""
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="1dp"
             android:layout_weight="1"
             android:background="@color/colorPrimaryDark"
-            android:text="Place offer"
-            android:textColor="@color/white"/>
+            android:text="@string/place_offer"
+            android:textColor="@color/white" />
     </LinearLayout>
 </LinearLayout>

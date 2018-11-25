@@ -1,39 +1,39 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!-- you can exchange coins here-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Exchange_Pop_Up">
-
+    tools:context=".ExchangePopUp">
+    <!-- Displays how many coins/coin items you can still exchange today-->
     <TextView
         android:id="@+id/broke_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimaryDark"
-        android:text="You have an exchange capacity of 25"
+        android:text="@string/you_have_an_exchange_capacity_of_25"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="20sp"
         android:textStyle="bold" />
-
+    <!-- Text that tells you to tap on items to select/unselect them-->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:text="Tap on item to exchange it."
+        android:text="@string/tap_on_item_to_exchange_it"
         android:textAlignment="center" />
-
+    <!-- Displays coin items-->
     <ListView
         android:id="@+id/list_view"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"></ListView>
-
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+    <!-- Button to go back to depot-->
     <Button
         android:id="@+id/back_button"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@color/colorPrimaryDark"
-        android:text="Back to Depot"
-        android:textColor="@color/white"/>
+        android:text="@string/back_to_depot"
+        android:textColor="@color/white" />
 </LinearLayout>

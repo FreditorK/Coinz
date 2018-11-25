@@ -1,27 +1,49 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!-- this is where you start the makeOffer activity of browseOffers activity-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/browse_offers_img"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:adjustViewBounds="true"
-        android:src="@drawable/browseoffers"
+        android:layout_height="match_parent"
+        android:layout_margin="1dp"
         android:layout_weight="1"
-        android:background="@color/colorPrimary"
-        android:layout_margin="2dp" />
-
+        android:orientation="vertical">
+        <!-- enter username you want to filter by the offers you can browse -->
+        <EditText
+            android:id="@+id/filter_by"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/colorPrimaryDark"
+            android:hint="@string/filter_by_username"
+            android:inputType="text"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textColorHint="@color/whiteTransparent"
+            tools:ignore="Autofill" /><!-- autofill is only supported for oreo -->
+        <!-- browse offers image -> decoration  -->
+        <ImageView
+            android:id="@+id/browse_offers_img"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:background="@color/colorPrimaryDark"
+            android:contentDescription="@string/browse_offers"
+            android:src="@drawable/browseoffers" />
+    </LinearLayout>
+    <!-- make offers image -> decoration  -->
     <ImageView
         android:id="@+id/make_an_offer"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="1dp"
         android:layout_weight="1"
         android:adjustViewBounds="true"
-        android:src="@drawable/makeanoffer"
-        android:background="@color/colorPrimary"
-        android:layout_margin="2dp" />
+        android:background="@color/colorPrimaryDark"
+        android:contentDescription="@string/make_offers"
+        android:src="@drawable/makeanoffer" />
 
 </LinearLayout>

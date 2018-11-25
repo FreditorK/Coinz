@@ -1,11 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!-- this layout contains all the graphs showing the exchange rates-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <!-- all graphs follow the same scheme
+    Displaying plot,
+    Displaying Currency and exchange rate, displaying button to confirm exchange intention-->
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="3dp">
 
@@ -19,30 +23,31 @@
                 android:id="@+id/shil_graph"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:background="@color/grey"/>
+                android:background="@color/grey" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:padding="1dp"
-                android:background="@color/coinGreen">
+                android:background="@color/coinGreen"
+                android:padding="1dp">
 
                 <TextView
+                    android:id="@+id/shil_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:text="SHIL: 0"
-                    android:textSize="32dp"
-                    android:id="@+id/shil_text"/>
+                    android:layout_alignParentStart="true"
+                    android:text="@string/shil_0"
+                    android:textSize="32sp" />
 
                 <Button
                     android:id="@+id/shil_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:background="@color/coinGreenAccent"
                     android:padding="1dp"
-                    android:text="Exchange"
-                    android:background="@color/coinGreenAccent"/>
+                    android:text="@string/exchange"
+                    tools:ignore="RelativeOverlap" /><!-- exchange rates too short for overlap-->
             </RelativeLayout>
         </LinearLayout>
 
@@ -56,7 +61,7 @@
                 android:id="@+id/dolr_graph"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:background="@color/grey"/>
+                android:background="@color/grey" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -64,22 +69,23 @@
                 android:background="@color/coinBlue">
 
                 <TextView
+                    android:id="@+id/dolr_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:padding="1dp"
-                    android:text="DOLR: 0"
-                    android:textSize="32dp"
-                    android:id="@+id/dolr_text"/>
+                    android:text="@string/dolr_0"
+                    android:textSize="32sp" />
 
                 <Button
                     android:id="@+id/dolr_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:background="@color/coinBlueAccent"
                     android:padding="1dp"
-                    android:text="Exchange"
-                    android:background="@color/coinBlueAccent"/>
+                    android:text="@string/exchange"
+                    tools:ignore="RelativeOverlap" /><!-- exchange rates too short for overlap-->
             </RelativeLayout>
         </LinearLayout>
 
@@ -93,7 +99,7 @@
                 android:id="@+id/quid_graph"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:background="@color/grey"/>
+                android:background="@color/grey" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -101,22 +107,23 @@
                 android:background="@color/coinYellow">
 
                 <TextView
+                    android:id="@+id/quid_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:padding="1dp"
-                    android:text="QUID: 0"
-                    android:textSize="32dp"
-                    android:id="@+id/quid_text"/>
+                    android:text="@string/quid_0"
+                    android:textSize="32sp" />
 
                 <Button
                     android:id="@+id/quid_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:background="@color/coinYellowAccent"
                     android:padding="1dp"
-                    android:text="Exchange"
-                    android:background="@color/coinYellowAccent"/>
+                    android:text="@string/exchange"
+                    tools:ignore="RelativeOverlap" /><!-- exchange rates too short for overlap-->
             </RelativeLayout>
         </LinearLayout>
 
@@ -130,30 +137,31 @@
                 android:id="@+id/peny_graph"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:background="@color/grey"/>
+                android:background="@color/grey" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:padding="1dp"
-                android:background="@color/coinRed">
+                android:background="@color/coinRed"
+                android:padding="1dp">
 
                 <TextView
+                    android:id="@+id/peny_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:text="PENY: 0"
-                    android:textSize="32dp"
-                    android:id="@+id/peny_text"/>
+                    android:layout_alignParentStart="true"
+                    android:text="@string/peny_0"
+                    android:textSize="32sp" />
 
                 <Button
                     android:id="@+id/peny_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:background="@color/coinRedAccent"
                     android:padding="1dp"
-                    android:text="Exchange"
-                    android:background="@color/coinRedAccent"/>
+                    android:text="@string/exchange"
+                    tools:ignore="RelativeOverlap" /><!-- exchange rates too short for overlap-->
             </RelativeLayout>
         </LinearLayout>
     </LinearLayout>

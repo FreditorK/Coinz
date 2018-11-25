@@ -1,46 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+    <!-- headline-->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:text="Select offer to accept"
-        android:textAlignment="center"
         android:background="@color/colorPrimaryDark"
+        android:text="@string/select_offer_to_accept"
+        android:textAlignment="center"
         android:textColor="@color/white"
+        android:textSize="20sp"
         android:textStyle="bold" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
+        android:layout_marginTop="1dp"
         android:background="@color/colorPrimary"
-        android:layout_marginTop="1dp">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <!-- gold icon-->
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@mipmap/gold"/>
+            android:contentDescription="@string/gold"
+            android:src="@mipmap/gold" />
+        <!-- current amount of gold in bank-->
         <TextView
             android:id="@+id/current_gold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textColor="@color/white"/>
+            android:textColor="@color/white"
+            android:textSize="20sp" />
     </LinearLayout>
+    <!-- lists browse items-->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rec_list_view"
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-    </android.support.v7.widget.RecyclerView>
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+    <!-- go back to depot button-->
     <Button
         android:id="@+id/back_button"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:text="Back to Depot"
         android:background="@color/colorPrimaryDark"
-        android:textColor="@color/white"/>
+        android:text="@string/back_to_depot"
+        android:textColor="@color/white" />
 </LinearLayout>
