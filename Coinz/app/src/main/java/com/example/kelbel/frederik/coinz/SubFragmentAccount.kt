@@ -38,11 +38,16 @@ class SubFragmentAccount : Fragment() {//fragment visible on opening
     }
 
     fun updateBars() {//update barplot
-        val layoutParamscr = LinearLayout.LayoutParams(200, creepersize * 20)
-        val layoutParamsca = LinearLayout.LayoutParams(200, carversize * 20)
+        val layoutParamscr = LinearLayout.LayoutParams(200, creepersize * 18)
+        val layoutParamsca = LinearLayout.LayoutParams(200, carversize * 18)
         layoutParamsca.gravity = Gravity.CENTER_HORIZONTAL
         layoutParamscr.gravity = Gravity.CENTER_HORIZONTAL
         creeperbar?.layoutParams = layoutParamscr
         carverbar?.layoutParams = layoutParamsca
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateBars()
     }
 }

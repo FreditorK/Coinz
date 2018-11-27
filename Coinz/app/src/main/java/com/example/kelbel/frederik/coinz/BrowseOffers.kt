@@ -21,6 +21,8 @@ import com.ebanx.swipebtn.SwipeButton
 import com.google.firebase.auth.FirebaseAuth
 
 
+
+
 class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold for coins, coin messaging
 
     private lateinit var backbutton: Button//go back to depot
@@ -85,7 +87,7 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
                                 s.currency = n.currency
                                 s.value = n.value.toDouble()
                                 s.picRef = resources.getIdentifier(n.currency + n.marker_symbol, "mipmap", packageName)
-                                s.marker_symbol = n.marker_symbol
+                                s.markersymbol = n.marker_symbol
                                 s.coordinates = n.coordinates
                                 offer.children?.add(s)
                             }
@@ -149,6 +151,9 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
                                 Toast.makeText(baseContext, "Not enough gold in depot!", Toast.LENGTH_SHORT).show()
                             }
                         }
+                        //exclusively for test purposes
+                        ProfileActivity.h = holder
+                        //-----------------------------
                         //add coins to expandable list in layout
                         val noOfChildTextViews = holder.childitems?.childCount
                         val noOfChild = o.children!!.size
@@ -197,9 +202,9 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
                                                     Toast.makeText(applicationContext, "Trade executed", Toast.LENGTH_SHORT).show()
                                                     for (n in offer.children!!) {//retrieve coins and mark them as traded so that they can be exchanged even when exchanged 25 coins already
                                                         if (n.id!!.matches(Regex(".*TRADED"))) {
-                                                            ProfileActivity.collect(NastyCoin(n.id!!, n.value!!.toFloat(), n.currency!!, n.marker_symbol!!, n.coordinates!!))
+                                                            ProfileActivity.collect(NastyCoin(n.id!!, n.value!!.toFloat(), n.currency!!, n.markersymbol!!, n.coordinates!!))
                                                         } else {
-                                                            ProfileActivity.collect(NastyCoin(n.id!! + "TRADED", n.value!!.toFloat(), n.currency!!, n.marker_symbol!!, n.coordinates!!))
+                                                            ProfileActivity.collect(NastyCoin(n.id!! + "TRADED", n.value!!.toFloat(), n.currency!!, n.markersymbol!!, n.coordinates!!))
                                                         }
                                                     }
                                                     ProfileActivity.gold -= offer.gold!!.toFloat()//decrease gold of offer acceptor
@@ -226,7 +231,7 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
 
     class TradeOfferHolder(itemView: View, offerList: MutableList<TradeOffer>, context: Context) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         //Viewholder for the offers
-        private var expand: ImageView? = null//expand arrow
+        var expand: ImageView? = null//expand arrow
         var swipeButton: SwipeButton? = null
         var user: TextView? = null//offerer
         var gold: TextView? = null//price
@@ -300,5 +305,4 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
         super.onStop()
         fRecyclerAdapter!!.stopListening()
     }
-
 }

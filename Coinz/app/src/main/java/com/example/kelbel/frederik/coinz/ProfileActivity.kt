@@ -1,11 +1,14 @@
 package com.example.kelbel.frederik.coinz
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.support.annotation.VisibleForTesting
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.FrameLayout
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import java.text.SimpleDateFormat
@@ -37,6 +40,14 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
         lateinit var wallet: Wallet//local wallet
         lateinit var nastycoins: ArrayList<NastyCoin>//coins from the map that have not been collected yet
         var coinExchangeRates: ArrayList<CoinExchangeRates>? = null//exchange rates this week
+
+        //exclusively for test purposes
+        @SuppressLint("StaticFieldLeak")
+        @VisibleForTesting var h: BrowseOffers.TradeOfferHolder? = null//test-variable that enables espresso to swipe the swipe button
+        @JvmField
+        var isTest: Boolean = false //makes the set up for tests possible
+        //-----------------------------
+
         fun collect(n: NastyCoin) {//called when coin is collected on the map
             when (n.currency) {
                 "shil" -> wallet.shilCoins.add(n)
@@ -83,7 +94,12 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
 
         user = FirebaseAuth.getInstance().currentUser?.email.toString()
 
-        getLocalAndWebData()//dowload exchange rates and new map
+        if (isTest){
+            setUpTestEnvironment()
+        }else {
+            getLocalAndWebData()//dowload exchange rates and new map
+        }
+        setUpFragments()
 
     }
 
@@ -106,7 +122,7 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
         displayFragmentDepot()//depot is the fragment visible on opening the app
     }
 
-    private fun displayFragmentDepot() {
+    private fun displayFragmentDepot() {//displays depot
         val ft = supportFragmentManager.beginTransaction()
         if (fragmentDepot!!.isAdded) {
             ft.show(fragmentDepot)
@@ -123,7 +139,7 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
         ft.commit()
     }
 
-    fun displayFragmentMap() {
+    fun displayFragmentMap() {//displays map
         val ft = supportFragmentManager.beginTransaction()
         if (fragmentMap!!.isAdded) {
             ft.show(fragmentMap)
@@ -139,7 +155,7 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
         ft.commit()
     }
 
-    private fun displayFragmentSettings() {
+    private fun displayFragmentSettings() {//displays settings
         val ft = supportFragmentManager.beginTransaction()
         if (fragmentSettings!!.isAdded) {
             ft.show(fragmentSettings)
@@ -161,7 +177,7 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
 
     override fun onPause() {
         super.onPause()
-        saveProgress()
+        saveProgress()//saves progress on pausing/quitting the game
     }
 
     private fun saveProgress() {//saves progress to firestore
@@ -173,23 +189,29 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
         //consider storing data locally on failure
         val db = FirebaseFirestore.getInstance().collection("users").document(user)
         db.update("lD", downloadDate)
-                .addOnFailureListener {e ->
-                    Log.e("ProfileActivity", "Failed saving downloadDate", e) }
+                .addOnFailureListener { e ->
+                    Log.e("ProfileActivity", "Failed saving downloadDate", e)
+                }
         db.update("exchangeCount", exchangedCount)
-                .addOnFailureListener {e ->
-                    Log.e("ProfileActivity", "Failed saving exchangeCount", e)}
+                .addOnFailureListener { e ->
+                    Log.e("ProfileActivity", "Failed saving exchangeCount", e)
+                }
         db.update("gold", gold)
-                .addOnFailureListener {e ->
-                    Log.e("ProfileActivity", "Failed saving gold", e)}
+                .addOnFailureListener { e ->
+                    Log.e("ProfileActivity", "Failed saving gold", e)
+                }
         db.update("wallet", gson.toJson(wallet))
-                .addOnFailureListener {e ->
-                    Log.e("ProfileActivity", "Failed saving wallet", e)}
+                .addOnFailureListener { e ->
+                    Log.e("ProfileActivity", "Failed saving wallet", e)
+                }
         db.update("nastycoins", gson.toJson(nastycoins))
-                .addOnFailureListener {e ->
-                    Log.e("ProfileActivity", "Failed saving nastycoins", e)}
+                .addOnFailureListener { e ->
+                    Log.e("ProfileActivity", "Failed saving nastycoins", e)
+                }
         db.update("movingSac", SubFragmentEvents.eventAvailability)
-                .addOnFailureListener {e ->
-                    Log.e("ProfileActivity", "Failed saving movingSac", e)}
+                .addOnFailureListener { e ->
+                    Log.e("ProfileActivity", "Failed saving movingSac", e)
+                }
     }
 
     private fun getLocalAndWebData() {//retrieve data on event availability, exchange rates and map
@@ -201,13 +223,78 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
             exchangedCount = 0
         }
         coinExchangeRates = gson.fromJson<ArrayList<CoinExchangeRates>>(getSharedPreferences("General", Context.MODE_PRIVATE).getString("ER", ""), object : TypeToken<ArrayList<CoinExchangeRates>>() {}.type)
-        if(coinExchangeRates!= null){//check if today's exchange rates are correct
-            if(SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(coinExchangeRates!![0].date.time).toString() != getCurrentDate()){
+        if (coinExchangeRates != null) {//check if today's exchange rates are correct
+            if (SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(coinExchangeRates!![0].date.time).toString() != getCurrentDate()) {
                 DownloadFileTask().execute("http://homepages.inf.ed.ac.uk/stg/coinz/$downloadDate/coinzmap.geojson")
             }
-        }else{
+        } else {
             DownloadFileTask().execute("http://homepages.inf.ed.ac.uk/stg/coinz/$downloadDate/coinzmap.geojson")
         }
-        setUpFragments()
+    }
+
+    @VisibleForTesting
+    fun setUpTestEnvironment() {//sets up the app for testing
+        exchangedCount = 0
+        gold = 100000.0f
+        wallet = Wallet(arrayListOf(genCoin(0, 5.6)), arrayListOf(genCoin(1, 2.1)), arrayListOf(genCoin(2, 7.8)), arrayListOf(genCoin(3, 1.9)))
+        downloadDate = "2018/11/24"
+        DownloadFileTask().execute("http://homepages.inf.ed.ac.uk/stg/coinz/2018/11/24/coinzmap.geojson")
+        SubFragmentEvents.eventAvailability = true
+        exchangedCount = 0
+    }
+
+    @VisibleForTesting
+    private fun genCoin(l: Int, k: Double): NastyCoin {//generates a coin of given value for given currency
+        var s = "shil"
+        when (l) {
+            0 -> s = "shil"
+            1 -> s = "dolr"
+            2 -> s = "quid"
+            3 -> s = "peny"
+        }
+        return NastyCoin("Test-" + System.currentTimeMillis().toString(), k.toFloat(), s, truncate(k).toInt().toString(), Pair(0.0, 0.0))
+    }
+
+    @VisibleForTesting
+    fun postTestOffer() {//sets up an offer for testing purposes
+        val offer = HashMap<String, Any>()
+        val gold = 200.5
+        val gson = Gson()
+        offer["user"] = "testcase2@useless.com"
+        offer["gold"] = gold
+        val nastyCoin1 = genCoin(3, 9.6)
+        val nastyCoin2 = genCoin(1, 3.2)
+        nastyCoin1.id = "FirstTest1"
+        nastyCoin2.id = "FirstTest2"
+        offer["nastycoins"] = gson.toJson(arrayListOf(nastyCoin1, nastyCoin2))
+
+        //upload offer to firestore and return to depot
+        val db = FirebaseFirestore.getInstance()
+        db.collection("trade_offers")
+                .add(offer)
+                .addOnSuccessListener {
+                    Toast.makeText(applicationContext, "Test-offer placed", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Log.w("ProfileActivity", "Error adding test-document", e)
+                    Toast.makeText(applicationContext, "Test-offer was not placed. Check connection!", Toast.LENGTH_SHORT).show()
+                }
+    }
+
+    @VisibleForTesting
+    fun acceptOfferTest(){//used to accept an offer in BrowseOffers since Espresso does not seem to be able to do that
+        h?.swipeButton?.toggleState()
+    }
+    @VisibleForTesting
+    fun expandTest(){//used to click on expand button of offer in BrowseOffers since Espresso does not seem to be able to do that
+        h?.expand?.performClick()
+    }
+    @VisibleForTesting
+    fun makeAllZonesBlue(){
+        /*makes all zones blue so that no problems are encountered in GatheringTest when gathering coins
+        * remember: Coins can only be collected in a zone of your team*/
+        for(i in 0..24) {
+            FirebaseFirestore.getInstance().collection("zones").document(i.toString()).update("c", -1868855061)
+        }
     }
 }

@@ -8,6 +8,6 @@ class SubTradeOffer : Serializable {
     var picRef: Int? = null
     var value: Double? = null
     var currency: String? = null
-    var marker_symbol: String? = null
+    var markersymbol: String? = null
     var coordinates: Pair<Double, Double>? = null
 }

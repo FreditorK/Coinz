@@ -2,11 +2,14 @@ package com.example.kelbel.frederik.coinz
 
 import android.animation.*
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.location.Criteria
 import android.location.Location
-import android.os.Bundle
-import android.os.CountDownTimer
+import android.location.LocationManager
+import android.os.*
+import android.support.annotation.VisibleForTesting
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
@@ -62,6 +65,8 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
     private val columns = arrayOf(-3.192473, -3.1908422, -3.1892114, -3.1875806, -3.1859498, -3.184319)
     //blue color values for coords
     private val cbs = arrayOf(Color.parseColor("#90020051"), Color.parseColor("#9004008e"), Color.parseColor("#900700cc"), Color.parseColor("#90514cdb"), Color.parseColor("#909b88eb"))
+
+    @VisibleForTesting var counter : Int = 71//counts down for tests, one counter value corresponds to one location
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_map, container, false)
@@ -341,7 +346,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
         }
     }
 
-    override fun onPermissionResult(granted: Boolean) {
+    override fun onPermissionResult(granted: Boolean) {//enable location if permission granted
         Log.d(t, "[onPermissionResult] granted == $granted")
         if (granted) {
             enableLocation()
@@ -399,6 +404,60 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
                 SubFragmentEvents.eventAvailability = false
             }
             return latLng
+        }
+    }
+    @VisibleForTesting
+    fun loc(){//called iteratively in GatheringTest, mocks location
+        val locs = arrayOf(Pair(-3.187363,55.944453), Pair(-3.188036,55.944773), Pair(-3.187855,55.944723),
+                Pair(-3.187695,55.944656), Pair(-3.187552,55.944582), Pair(-3.187458,55.944541),
+                Pair(-3.187335,55.944489), Pair(-3.187436,55.944461), Pair(-3.187561,55.944438),
+                Pair(-3.187679,55.944423), Pair(-3.187793,55.944407), Pair(-3.187902,55.944394),
+                Pair(-3.188013,55.944358), Pair(-3.188136,55.944355), Pair(-3.188262,55.944351),
+                Pair(-3.188382,55.944343), Pair(-3.188500,55.944333), Pair(-3.188618,55.944313),
+                Pair(-3.188740,55.944301), Pair(-3.188841,55.944262), Pair(-3.188958,55.944234),
+                Pair(-3.189076,55.944215), Pair(-3.189188,55.944198), Pair(-3.189318,55.944182),
+                Pair(-3.189447,55.944168), Pair(-3.189559,55.944148), Pair(-3.189686,55.944139),
+                Pair(-3.189816,55.944128), Pair(-3.189933,55.944109), Pair(-3.190063,55.944099),
+                Pair(-3.190181,55.944091), Pair(-3.190303,55.944108), Pair(-3.190420,55.944100),
+                Pair(-3.190537,55.944089), Pair(-3.190655,55.944066), Pair(-3.190767,55.944037),
+                Pair(-3.190895,55.944023), Pair(-3.191013,55.944023), Pair(-3.191129,55.944018),
+                Pair(-3.191255,55.943996), Pair(-3.191350,55.944035), Pair(-3.191373,55.944107),
+                Pair(-3.191396,55.944174), Pair(-3.191430,55.944244), Pair(-3.191422,55.944319),
+                Pair(-3.191422,55.944385), Pair(-3.191468,55.944447), Pair(-3.191466,55.944520),
+                Pair(-3.191470,55.944594), Pair(-3.191472,55.944658), Pair(-3.191447,55.944738),
+                Pair(-3.191432,55.944802), Pair(-3.191414,55.944871), Pair(-3.191410,55.944940),
+                Pair(-3.191401,55.945004), Pair(-3.191387,55.945067), Pair(-3.191209,55.945243),
+                Pair(-3.191251,55.945309), Pair(-3.191258,55.945380), Pair(-3.191222,55.945440),
+                Pair(-3.191249,55.945504), Pair(-3.191263,55.945569), Pair(-3.191245,55.945640),
+                Pair(-3.191223,55.945709), Pair(-3.191193,55.945780), Pair(-3.191181,55.945845),
+                Pair(-3.191189,55.945908), Pair(-3.191191,55.945971), Pair(-3.191295,55.946011),
+                Pair(-3.191425,55.946024), Pair(-3.191542,55.946026), Pair(-3.191648,55.946052))//mock locations/mock path
+
+        //adds a mock-location-provider to the location manager
+        val lm = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val criteria = Criteria()
+        criteria.accuracy = Criteria.ACCURACY_FINE
+        val mocLocationProvider = LocationManager.GPS_PROVIDER
+        lm.addTestProvider(mocLocationProvider, false, false,
+                false, false, true, true, true, 0, 5)
+        lm.setTestProviderEnabled(mocLocationProvider, true)
+
+        val loc = Location(mocLocationProvider)
+        val mockLocation = Location(mocLocationProvider)
+
+        if(counter >= 0){//do nothing if counter dropped below zero
+            //set next mock location
+            mockLocation.latitude = locs[counter].second
+            mockLocation.longitude = locs[counter].first
+            mockLocation.altitude = loc.altitude
+            mockLocation.time = System.currentTimeMillis()
+            mockLocation.accuracy = 1.0f
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                mockLocation.elapsedRealtimeNanos = SystemClock.elapsedRealtimeNanos()
+            }
+            lm.setTestProviderLocation(mocLocationProvider, mockLocation)
+            counter--
         }
     }
 }

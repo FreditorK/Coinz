@@ -1,6 +1,7 @@
 package com.example.kelbel.frederik.coinz
 
 import android.os.AsyncTask
+import android.util.Log
 import org.apache.commons.io.IOUtils
 import org.json.JSONArray
 import org.json.JSONObject
@@ -24,7 +25,7 @@ class DownloadFileTask : AsyncTask<String, Void, String>() {//downloads current 
             values.DOLR = json.getJSONObject("rates").getString("DOLR").toFloat()
             values.QUID = json.getJSONObject("rates").getString("QUID").toFloat()
             values.PENY = json.getJSONObject("rates").getString("PENY").toFloat()
-            values.date = Calendar.getInstance().time
+            values.date = SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).parse(ProfileActivity.downloadDate)
             return values
         }
 
@@ -84,6 +85,7 @@ class DownloadFileTask : AsyncTask<String, Void, String>() {//downloads current 
     }
 
     private fun doStuff(s: String) {
+        Log.d("Giraffe", s)
         val json = JSONObject(s)
 
         ProfileActivity.nastycoins = retrieveCoins(json)
