@@ -38,8 +38,14 @@ class SubFragmentAccount : Fragment() {//fragment visible on opening
     }
 
     fun updateBars() {//update barplot
-        val layoutParamscr = LinearLayout.LayoutParams(200, creepersize * 18)
-        val layoutParamsca = LinearLayout.LayoutParams(200, carversize * 18)
+        val layoutParamscr = LinearLayout.LayoutParams(200, creepersize * 19)
+        val layoutParamsca = LinearLayout.LayoutParams(200, carversize * 19)
+        if(layoutParamsca.height > 475){//bug workaround where bar is greater than 450
+            layoutParamsca.height = 475
+        }
+        if(layoutParamscr.height > 475){
+            layoutParamscr.height = 475
+        }
         layoutParamsca.gravity = Gravity.CENTER_HORIZONTAL
         layoutParamscr.gravity = Gravity.CENTER_HORIZONTAL
         creeperbar?.layoutParams = layoutParamscr

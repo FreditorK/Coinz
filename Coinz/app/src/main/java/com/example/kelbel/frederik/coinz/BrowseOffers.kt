@@ -86,8 +86,8 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
                                 s.id = n.id
                                 s.currency = n.currency
                                 s.value = n.value.toDouble()
-                                s.picRef = resources.getIdentifier(n.currency + n.marker_symbol, "mipmap", packageName)
-                                s.markersymbol = n.marker_symbol
+                                s.picRef = resources.getIdentifier(n.currency + n.markersymbol, "mipmap", this.packageName)
+                                s.markersymbol = n.markersymbol
                                 s.coordinates = n.coordinates
                                 offer.children?.add(s)
                             }
@@ -193,9 +193,9 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
                         .get()
                         .addOnSuccessListener {
                             //update gold of trade offerer
-                            val currentGold = it.getDouble("gold")
+                            val currentPlus = it.getDouble("plus")
                             FirebaseFirestore.getInstance().collection("users").document(offer.user.toString())
-                                    .update("gold", offer.gold!! + currentGold!!)
+                                    .update("plus", currentPlus!! + offer.gold!!)
                                     .addOnSuccessListener {
                                         offer.id?.delete()!!
                                                 .addOnSuccessListener {
@@ -248,11 +248,11 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
                 childitems = itemView.findViewById(R.id.child_items)
                 childitems?.visibility = View.GONE
                 var intMaxNoOfChild = 0
-                for (index in 0 until offerList.size) {
+                for (index in 0 until offerList.size) {//getting size of longest expandeable list for coin items
                     val intMaxSizeTemp = offerList[index].children!!.size
                     if (intMaxSizeTemp > intMaxNoOfChild) intMaxNoOfChild = intMaxSizeTemp
                 }
-                for (indexView in 0 until intMaxNoOfChild) {
+                for (indexView in 0 until intMaxNoOfChild) {//assign values to expandable list containing coin items
                     val linearlay = LinearLayout(context)
                     val imageView = ImageView(context)
                     val linearlay2 = LinearLayout(context)

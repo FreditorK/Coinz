@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.view.ViewPager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.FirebaseFirestore
 
 class FragmentDepot : Fragment() {
 
@@ -55,10 +58,10 @@ class FragmentDepot : Fragment() {
         firebaseAuth = FirebaseAuth.getInstance()
 
         account = SubFragmentAccount()//keeping reference of this fragment for use in other files
-        adapter.AddFragment(account!!, "Account")
-        adapter.AddFragment(SubFragmentExchange(), "Exchange")
-        adapter.AddFragment(SubFragmentTrading(), "Trading")
-        adapter.AddFragment(SubFragmentEvents(), "Events")
+        adapter.addFragment(account!!, "Account")
+        adapter.addFragment(SubFragmentExchange(), "Exchange")
+        adapter.addFragment(SubFragmentTrading(), "Trading")
+        adapter.addFragment(SubFragmentEvents(), "Events")
 
         viewPager?.adapter = adapter
         tabLayout?.setupWithViewPager(viewPager)
@@ -77,6 +80,19 @@ class FragmentDepot : Fragment() {
                         .into(profilepic)
             }
         }
+
+        FirebaseFirestore.getInstance().collection("users").document(user?.email.toString())
+                .addSnapshotListener(EventListener { documentSnapshot, e ->
+                    if (e != null) {
+                        Log.e("TeamZone", "Listen failed!", e)
+                        return@EventListener
+                    }
+
+                    if (documentSnapshot != null) {
+                        ProfileActivity.gold += documentSnapshot.getDouble("plus")!!.toFloat()
+                        goldtext?.text = ProfileActivity.gold.toString()
+                    }
+                })
     }
 
     fun getAccount(): SubFragmentAccount? {//return fragment instance

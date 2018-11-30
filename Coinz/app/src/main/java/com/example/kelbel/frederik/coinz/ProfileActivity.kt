@@ -19,9 +19,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.math.truncate
 
 
-class ProfileActivity : AppCompatActivity() {//This activity is the main activity of action
+class ProfileActivity : AppCompatActivity() , OnCompleted {//This activity is the main activity of action
 
-    private var bottomNavigationView: BottomNavigationView? = null //bottom navigation between depot, map and settings
+    var bottomNavigationView: BottomNavigationView? = null //bottom navigation between depot, map and settings
     private var startFrame: FrameLayout? = null//frame to be filled by the fragments
 
     //fragments
@@ -43,7 +43,8 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
 
         //exclusively for test purposes
         @SuppressLint("StaticFieldLeak")
-        @VisibleForTesting var h: BrowseOffers.TradeOfferHolder? = null//test-variable that enables espresso to swipe the swipe button
+        @VisibleForTesting
+        var h: BrowseOffers.TradeOfferHolder? = null//test-variable that enables espresso to swipe the swipe button
         @JvmField
         var isTest: Boolean = false //makes the set up for tests possible
         //-----------------------------
@@ -94,12 +95,13 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
 
         user = FirebaseAuth.getInstance().currentUser?.email.toString()
 
-        if (isTest){
+        if (isTest) {
             setUpTestEnvironment()
-        }else {
-            getLocalAndWebData()//dowload exchange rates and new map
+            setUpFragments()
+        } else {
+            setUpFragments()
+            getLocalAndWebData()//download exchange rates and new map
         }
-        setUpFragments()
 
     }
 
@@ -107,6 +109,7 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
         fragmentDepot = FragmentDepot()
         fragmentMap = FragmentMap()
         fragmentSettings = FragmentSettings()
+        displayFragmentDepot()//depot is the fragment visible on opening the app
 
         bottomNavigationView?.setOnNavigationItemSelectedListener {
             when (it.itemId) {
@@ -119,7 +122,6 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
             }
             return@setOnNavigationItemSelectedListener true
         }
-        displayFragmentDepot()//depot is the fragment visible on opening the app
     }
 
     private fun displayFragmentDepot() {//displays depot
@@ -139,7 +141,7 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
         ft.commit()
     }
 
-    fun displayFragmentMap() {//displays map
+    private fun displayFragmentMap() {//displays map
         val ft = supportFragmentManager.beginTransaction()
         if (fragmentMap!!.isAdded) {
             ft.show(fragmentMap)
@@ -186,7 +188,7 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
         sharedprefsEditor.putString("ER", gson.toJson(coinExchangeRates))
         sharedprefsEditor.apply()
 
-        //consider storing data locally on failure
+        //firestore automatically retries to update if connection is bad, otherwise automatically stored in cache
         val db = FirebaseFirestore.getInstance().collection("users").document(user)
         db.update("lD", downloadDate)
                 .addOnFailureListener { e ->
@@ -214,21 +216,29 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
                 }
     }
 
+    override fun onTaskCompleted() {
+        fragmentMap?.addMarkers()
+        fragmentMap?.drawPolygon()
+    }
+
     private fun getLocalAndWebData() {//retrieve data on event availability, exchange rates and map
         val gson = Gson()
+        coinExchangeRates = gson.fromJson<ArrayList<CoinExchangeRates>>(getSharedPreferences("General", Context.MODE_PRIVATE).getString("ER", ""), object : TypeToken<ArrayList<CoinExchangeRates>>() {}.type)
         if (downloadDate != getCurrentDate()) {
             downloadDate = getCurrentDate()
-            DownloadFileTask().execute("http://homepages.inf.ed.ac.uk/stg/coinz/$downloadDate/coinzmap.geojson")
+            DownloadFileTask(this).execute("http://homepages.inf.ed.ac.uk/stg/coinz/$downloadDate/coinzmap.geojson")
             SubFragmentEvents.eventAvailability = true
             exchangedCount = 0
+        }else{
+            fragmentMap?.addMarkers()
+            fragmentMap?.drawPolygon()
         }
-        coinExchangeRates = gson.fromJson<ArrayList<CoinExchangeRates>>(getSharedPreferences("General", Context.MODE_PRIVATE).getString("ER", ""), object : TypeToken<ArrayList<CoinExchangeRates>>() {}.type)
         if (coinExchangeRates != null) {//check if today's exchange rates are correct
             if (SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(coinExchangeRates!![0].date.time).toString() != getCurrentDate()) {
-                DownloadFileTask().execute("http://homepages.inf.ed.ac.uk/stg/coinz/$downloadDate/coinzmap.geojson")
+                DownloadFileTask(this).execute("http://homepages.inf.ed.ac.uk/stg/coinz/$downloadDate/coinzmap.geojson")
             }
         } else {
-            DownloadFileTask().execute("http://homepages.inf.ed.ac.uk/stg/coinz/$downloadDate/coinzmap.geojson")
+            DownloadFileTask(this).execute("http://homepages.inf.ed.ac.uk/stg/coinz/$downloadDate/coinzmap.geojson")
         }
     }
 
@@ -238,7 +248,7 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
         gold = 100000.0f
         wallet = Wallet(arrayListOf(genCoin(0, 5.6)), arrayListOf(genCoin(1, 2.1)), arrayListOf(genCoin(2, 7.8)), arrayListOf(genCoin(3, 1.9)))
         downloadDate = "2018/11/24"
-        DownloadFileTask().execute("http://homepages.inf.ed.ac.uk/stg/coinz/2018/11/24/coinzmap.geojson")
+        DownloadFileTask(this).execute("http://homepages.inf.ed.ac.uk/stg/coinz/2018/11/24/coinzmap.geojson")
         SubFragmentEvents.eventAvailability = true
         exchangedCount = 0
     }
@@ -282,18 +292,20 @@ class ProfileActivity : AppCompatActivity() {//This activity is the main activit
     }
 
     @VisibleForTesting
-    fun acceptOfferTest(){//used to accept an offer in BrowseOffers since Espresso does not seem to be able to do that
+    fun acceptOfferTest() {//used to accept an offer in BrowseOffers since Espresso does not seem to be able to do that
         h?.swipeButton?.toggleState()
     }
+
     @VisibleForTesting
-    fun expandTest(){//used to click on expand button of offer in BrowseOffers since Espresso does not seem to be able to do that
+    fun expandTest() {//used to click on expand button of offer in BrowseOffers since Espresso does not seem to be able to do that
         h?.expand?.performClick()
     }
+
     @VisibleForTesting
-    fun makeAllZonesBlue(){
+    fun makeAllZonesBlue() {
         /*makes all zones blue so that no problems are encountered in GatheringTest when gathering coins
         * remember: Coins can only be collected in a zone of your team*/
-        for(i in 0..24) {
+        for (i in 0..24) {
             FirebaseFirestore.getInstance().collection("zones").document(i.toString()).update("c", -1868855061)
         }
     }

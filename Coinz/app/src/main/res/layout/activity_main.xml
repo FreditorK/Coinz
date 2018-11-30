@@ -1,71 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?><!-- login page -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:gravity="center"
-    android:layout_height="match_parent">
-        <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_marginBottom="10dp"
-            android:src="@mipmap/launchericon"
-            android:contentDescription="@string/launchericon" />
+    android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp">
-                <!-- enter username for login -->
-                <EditText
-                    android:id="@+id/enter_username"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:hint="@string/username"
-                    android:inputType="textPersonName"
-                    android:paddingBottom="15dp"
-                    android:textAlignment="center"
-                    android:textColorHint="@color/colorAccent"
-                    tools:ignore="Autofill" /><!-- autofill is only supported for oreo -->
-                <!-- enter password for login -->
-                <EditText
-                    android:id="@+id/enter_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:hint="@string/password"
-                    android:inputType="textPassword"
-                    android:paddingBottom="15dp"
-                    android:textAlignment="center"
-                    android:textColorHint="@color/colorAccent"
-                    tools:ignore="Autofill" /><!-- autofill is only supported for oreo -->
-                <!-- click to login -->
-                <Button
-                    android:id="@+id/log_in_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="7dp"
-                    android:background="@color/colorPrimaryDark"
-                    android:text="@string/log_in"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorAccent" />
-                <!-- click to go to sign up -->
-                <TextView
-                    android:id="@+id/sign_up_textView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="15dp"
-                    android:text="@string/don_t_have_an_account_sign_up"
-                    android:textAlignment="center"
-                    android:textColor="@color/colorAccent" />
-            </LinearLayout>
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:contentDescription="@string/launchericon"
+        android:src="@mipmap/launchericon" />
     <!-- shows progress of logging in -->
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="30dp">
+        <!-- enter username for login -->
+        <EditText
+            android:id="@+id/enter_username"
+            android:drawableStart="@drawable/ic_action_user"
+            android:drawablePadding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:hint="@string/username"
+            android:inputType="textPersonName"
+            android:textColorHint="@color/colorAccent"
+            tools:ignore="Autofill"/><!-- autofill is only supported for oreo -->
+        <!-- enter password for login -->
+        <EditText
+            android:id="@+id/enter_password"
+            android:drawablePadding="10dp"
+            android:drawableStart="@drawable/ic_action_lock_closed2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:hint="@string/password"
+            android:inputType="textPassword"
+            android:textColorHint="@color/colorAccent"
+            tools:ignore="Autofill" /><!-- autofill is only supported for oreo -->
+        <!-- for confirming intentions to remember password and username -->
+        <CheckBox
+            android:id="@+id/remember_me"
+            android:layout_margin="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:text="@string/remember_me"
+            android:textColor="@color/colorAccent"/>
+        <!-- click to login -->
+        <Button
+            android:id="@+id/log_in_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="7dp"
+            android:background="@color/colorPrimaryDark"
+            android:text="@string/log_in"
+            android:textAllCaps="false"
+            android:textColor="@color/colorAccent" />
+        <!-- click to go to sign up -->
+        <TextView
+            android:id="@+id/sign_up_textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:text="@string/don_t_have_an_account_sign_up"
+            android:textAlignment="center"
+            android:textColor="@color/colorAccent" />
+    </LinearLayout>
 </LinearLayout>

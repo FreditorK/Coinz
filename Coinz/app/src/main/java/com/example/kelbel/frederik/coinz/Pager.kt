@@ -11,15 +11,15 @@ class Pager(fm: FragmentManager?, private val fragmentList: ArrayList<Fragment> 
     }
 
     override fun getItem(position: Int): Fragment {//get fragment
-        return fragmentList.get(position)
+        return fragmentList[position]
     }
 
     override fun getPageTitle(position: Int): CharSequence {//get title of fragment
-        return fragmentListTitles.get(position)
+        return fragmentListTitles[position]
     }
 
-    fun AddFragment(fragment: Fragment, title: String) {//add fragment to viewpager
+    fun addFragment(fragment: Fragment, title: String) {//add fragment to viewpager
         fragmentList.add(fragment)
-        fragmentListTitles.add(title)
+        this.fragmentListTitles.add(title)
     }
 }

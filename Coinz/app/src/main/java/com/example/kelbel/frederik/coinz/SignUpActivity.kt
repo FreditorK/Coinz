@@ -110,6 +110,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener {
         user["nastycoins"] = gson.toJson(arrayListOf<NastyCoin>())//coins available for collection
         user["movingSac"] = true//moving sac event available
         user["team"] = selectedTeam//set selected team
+        user["plus"] = 0 //plus in gold from trade, increases when offer accepted
 
         // Add user to firestore and set up variables in ProfileActivity
         FirebaseFirestore.getInstance().collection("users").document(username)

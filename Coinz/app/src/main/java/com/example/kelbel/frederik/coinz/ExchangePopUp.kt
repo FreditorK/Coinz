@@ -80,7 +80,7 @@ class ExchangePopUp : AppCompatActivity(), AdapterView.OnItemClickListener {//ac
     }
 
     private fun getFittingIconId(n : NastyCoin): Int{//Get the Icon to display on the map from Coin
-        return  resources.getIdentifier(n.currency + n.marker_symbol, "mipmap", packageName)
+        return  resources.getIdentifier(n.currency + n.markersymbol, "mipmap", packageName)
     }
 
     override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {//exchange onclick of coin

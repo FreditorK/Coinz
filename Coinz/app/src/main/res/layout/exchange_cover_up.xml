@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorPrimary">
     <!-- Displays how many coins/coin items you can still exchange today-->
     <TextView
         android:id="@+id/broke_text"
@@ -20,13 +21,16 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center"
+        android:textColor="@color/whiteTransparent"
         android:text="@string/there_are_no_items_to_exchange_here"
         android:textAlignment="center" />
     <!-- button to go back to depot-->
     <Button
         android:id="@+id/back_button"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
+        android:textSize="20sp"
+        android:textColor="@color/white"
         android:background="@color/colorPrimaryDark"
         android:text="@string/back_to_depot" />
 </LinearLayout>

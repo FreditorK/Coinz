@@ -9,7 +9,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="2dp"
+        android:layout_margin="1dp"
         android:background="@color/colorPrimary"
         android:orientation="vertical">
 
@@ -53,9 +53,24 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
+            android:orientation="horizontal"
             android:background="@color/colorPrimaryDark">
+            <!-- information display related to the event-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:background="@color/colorPrimaryDark"
+                android:padding="2dp"
+                android:text="@string/coins_collected_here"
+                android:textColor="@color/whiteTransparent"
+                android:textSize="14sp"
+                android:layout_weight="1"/>
             <!-- start event here-->
             <com.ebanx.swipebtn.SwipeButton
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
                 android:id="@+id/swipe_btn2"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
@@ -77,20 +92,8 @@
                 app:inner_text_bottom_padding="3dp"
                 app:inner_text_color="@android:color/white"
                 app:inner_text_size="15sp"
-                app:inner_text_top_padding="3dp" />
+                app:inner_text_top_padding="3dp"/>
         </LinearLayout>
-        <!-- information display related to the event-->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:background="@color/colorPrimaryDark"
-            android:padding="2dp"
-            android:text="@string/coins_collected_here"
-            android:textAlignment="center"
-            android:textColor="@color/whiteTransparent"
-            android:textSize="14sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -102,8 +105,9 @@
         <!-- More events can be added here instead of this message-->
         <TextView
             android:gravity="center"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="3dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/colorPrimaryDark"

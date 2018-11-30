@@ -4,6 +4,6 @@ data class NastyCoin(//object storing data of coin
         var id: String,
         var value: Float,
         var currency: String,
-        var marker_symbol: String,
+        var markersymbol: String,
         var coordinates: Pair<Double, Double>
 )

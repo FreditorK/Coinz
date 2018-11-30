@@ -367,9 +367,11 @@
         </LinearLayout>
         <!-- go back to depot here -->
         <Button
+            android:layout_marginTop="8dp"
             android:id="@+id/back_button"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="50dp"
+            android:textSize="20sp"
             android:background="@color/colorPrimaryDark"
             android:text="@string/back_to_depot"
             android:textColor="@color/white" />

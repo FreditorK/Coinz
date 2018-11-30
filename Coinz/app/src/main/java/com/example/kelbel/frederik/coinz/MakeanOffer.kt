@@ -78,12 +78,12 @@ class MakeanOffer : AppCompatActivity(), AdapterView.OnItemClickListener, View.O
     }
 
     private fun getFittingIconId(n: NastyCoin): Int {//Get the Icon to display on the map from Coin
-        return resources.getIdentifier(n.currency + n.marker_symbol, "mipmap", packageName)
+        return application.resources.getIdentifier(n.currency + n.markersymbol, "mipmap", application.packageName)
     }
 
     private fun selectOrUnselect(view: View?, pos: Int) {//manages selecting and unselecting coins for the offer
         if (selectedCoins.contains(listCoins[pos])) {//unselect
-            view?.background = getDrawable(R.color.colorPrimary)
+            view?.background = getDrawable(R.color.colorPrimaryDark)
             selectedCoins.remove(listCoins[pos])
         } else {//select
             view?.background = getDrawable(R.color.colorAccent)

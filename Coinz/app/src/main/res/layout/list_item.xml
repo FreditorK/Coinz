@@ -3,15 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="1dp"
-    android:background="@color/colorPrimary"
+    android:background="@color/colorPrimaryDark"
     android:orientation="horizontal">
     <!-- coin item icon-->
     <ImageView
         android:id="@+id/listview_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
         android:contentDescription="@string/coin_img"
-        android:padding="10dp"
+        android:padding="2dp"
         android:src="@mipmap/gold" />
 
     <LinearLayout

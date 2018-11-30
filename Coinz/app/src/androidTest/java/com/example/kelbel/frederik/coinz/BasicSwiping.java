@@ -54,21 +54,11 @@ public class BasicSwiping {
 
         ViewInteraction appCompatEditText = onView(
                 allOf(withId(R.id.enter_username),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                0),
                         isDisplayed()));
         appCompatEditText.perform(click());
 
         ViewInteraction appCompatEditText2 = onView(
                 allOf(withId(R.id.enter_username),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                0),
                         isDisplayed()));
         appCompatEditText2.perform(replaceText("testc"), closeSoftKeyboard());
 
@@ -83,21 +73,11 @@ public class BasicSwiping {
 
         ViewInteraction appCompatEditText3 = onView(
                 allOf(withId(R.id.enter_username), withText("testc"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                0),
                         isDisplayed()));
         appCompatEditText3.perform(replaceText("testcase1"));
 
         ViewInteraction appCompatEditText4 = onView(
                 allOf(withId(R.id.enter_username), withText("testcase1"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                0),
                         isDisplayed()));
         appCompatEditText4.perform(closeSoftKeyboard());
 
@@ -112,41 +92,21 @@ public class BasicSwiping {
 
         ViewInteraction appCompatEditText5 = onView(
                 allOf(withId(R.id.enter_username), withText("testcase1"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                0),
                         isDisplayed()));
         appCompatEditText5.perform(pressImeActionButton());
 
         ViewInteraction appCompatEditText6 = onView(
                 allOf(withId(R.id.enter_password),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                1),
                         isDisplayed()));
         appCompatEditText6.perform(replaceText("testcase1"), closeSoftKeyboard());
 
         ViewInteraction appCompatEditText7 = onView(
                 allOf(withId(R.id.enter_password), withText("testcase1"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                1),
                         isDisplayed()));
         appCompatEditText7.perform(pressImeActionButton());
 
         ViewInteraction appCompatButton = onView(
                 allOf(withId(R.id.log_in_button), withText("Log in"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                2),
                         isDisplayed()));
         appCompatButton.perform(click());
 

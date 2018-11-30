@@ -132,7 +132,7 @@ class TeamZone : AppCompatActivity() {//purchase zones for your team here
 
     private class ChoiceTouchListener : View.OnTouchListener {
         //listens for drag intentions
-        @SuppressLint("ClickableViewAccessibility")//calling performClick gives unwanted behaviour
+        @SuppressLint("ClickableViewAccessibility")//calling performClick can cause unwanted behaviour
         override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
             return if ((p1?.action == MotionEvent.ACTION_DOWN) && (p0 as ImageView).drawable != null) {
                 val data: ClipData = ClipData.newPlainText("", "")

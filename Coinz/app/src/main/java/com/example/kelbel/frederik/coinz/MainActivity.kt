@@ -1,5 +1,6 @@
 package com.example.kelbel.frederik.coinz
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -17,6 +18,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var enterusername: EditText? = null//username to login with
     private var enterpassword: EditText? = null//password to login with
     private var progressBar: ProgressBar? = null//loading circle
+    private lateinit var remember: CheckBox // remembers your password and username
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,8 +31,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         enterusername = findViewById(R.id.enter_username)
         enterpassword = findViewById(R.id.enter_password)
         progressBar = findViewById(R.id.progress_bar)
+        remember = findViewById(R.id.remember_me)
 
         firebaseAuth = FirebaseAuth.getInstance()
+
+        //get password and username from remembered data
+        enterusername?.setText(getSharedPreferences("General", Context.MODE_PRIVATE).getString("username", ""))
+        enterpassword?.setText(getSharedPreferences("General", Context.MODE_PRIVATE).getString("password", ""))
+
     }
 
     private fun login() {//called when log in button is clicked
@@ -49,6 +57,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             enterpassword?.error = "Password is to short"
             enterpassword?.requestFocus()
             return
+        }
+
+        if(remember.isChecked){//store if wished
+            val sharedprefsEditor = getSharedPreferences("General", Context.MODE_PRIVATE).edit()
+            sharedprefsEditor.putString("username", enterusername?.text.toString().trim())
+            sharedprefsEditor.putString("password", password)
+            sharedprefsEditor.apply()
         }
 
         progressBar?.visibility = View.VISIBLE//loading circle appears
@@ -101,7 +116,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                             finish()
                             startActivity(Intent(this, ProfileActivity()::class.java))
                         } else {
-                            Toast.makeText(this, "Check your Connection!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "User does not exist!", Toast.LENGTH_SHORT).show()
                             progressBar?.visibility = View.GONE
                         }
                     } else {

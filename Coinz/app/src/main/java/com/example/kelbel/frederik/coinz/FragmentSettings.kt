@@ -87,7 +87,7 @@ class FragmentSettings : Fragment() {
 
         savebutton?.setOnClickListener {
             //save new rofile picture
-            saveInformation()
+            uploadImageToFirebase()
         }
         val user = firebaseAuth?.currentUser
         passwordbutton?.setOnClickListener {
@@ -150,12 +150,10 @@ class FragmentSettings : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == pPIC && resultCode == Activity.RESULT_OK && data != null && data.data != null) {
             uriProfileImage = data.data
+            val bitmap = MediaStore.Images.Media.getBitmap(context?.contentResolver, uriProfileImage)
+            profilepic?.setImageBitmap(bitmap)//set profile picture
             try {
-                val bitmap = MediaStore.Images.Media.getBitmap(context?.contentResolver, uriProfileImage)
                 pic = bitmap
-                profilepic?.setImageBitmap(bitmap)//set profile picture
-                uploadImageToFirebase()//upload to firebase
-
             } catch (exception: IOException) {
                 exception.printStackTrace()
             }
@@ -169,30 +167,9 @@ class FragmentSettings : Fragment() {
         startActivityForResult(Intent.createChooser(intent, "Select Profile Picture"), pPIC)
     }
 
-    private fun saveInformation() {//saves your profile picture
-
-        val user = firebaseAuth?.currentUser
-
-        if (user != null && profileImageUrl != null) {
-            val profile = UserProfileChangeRequest.Builder()
-                    .setPhotoUri(profileImageUrl)
-                    .build()
-
-            user.updateProfile(profile)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Toast.makeText(context, "Profile Updated", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-        }
-        //adds profile picture to account fragment
-        if ((fragmentManager?.findFragmentByTag("A") != null && pic != null)) {
-            (fragmentManager?.findFragmentByTag("A") as FragmentDepot).profilepic?.setImageBitmap(pic)
-        }
-    }
-
     private fun uploadImageToFirebase() {//upload to firebase
         val profileImageRef = FirebaseStorage.getInstance().getReference("profilepics/" + username?.text.toString() + ".jpg")
+        Toast.makeText(context, "Uploading...", Toast.LENGTH_SHORT).show()
 
         if (uriProfileImage != null) {
             profileImageRef.putFile(uriProfileImage!!)
@@ -200,6 +177,26 @@ class FragmentSettings : Fragment() {
                         taskSnapshot.storage.downloadUrl.addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 profileImageUrl = task.result
+
+                                val user = firebaseAuth?.currentUser
+
+                                if (user != null && profileImageUrl != null) {
+                                    val profile = UserProfileChangeRequest.Builder()
+                                            .setPhotoUri(profileImageUrl)
+                                            .build()
+
+                                    user.updateProfile(profile)
+                                            .addOnCompleteListener {
+                                                if (it.isSuccessful) {
+                                                    Toast.makeText(context, "Profile Updated", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                }
+                                //adds profile picture to account fragment
+                                if ((fragmentManager?.findFragmentByTag("A") != null && pic != null)) {//sets pic in Depot
+                                    (fragmentManager?.findFragmentByTag("A") as FragmentDepot).profilepic?.setImageBitmap(pic)
+                                }
+
                             } else {
                                 Log.d(tag, "Problem with downloadUrl")
                             }

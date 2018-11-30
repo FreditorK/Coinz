@@ -36,9 +36,8 @@
     <string name="new_password">new password</string>
     <string name="set_new_password">set new password</string>
     <string name="switch_teams_app_will_restart">Switch teams? (app will restart!)</string>
-    <string name="i_understand_that_this_will_halve_the_amount_of_gold_i_currently_have">I understand that this will halve the amount of gold I currently have.</string>
+    <string name="i_understand_that_this_will_halve_the_amount_of_gold_i_currently_have">This will halve your current gold. Confirm your intention!</string>
     <string name="switch_team">switch team</string>
-    <string name="developed_by_frederik_kelbel">developed by Frederik Kelbel</string>
     <string name="coin_img">coin img</string>
     <string name="select_items_to_trade">Select items to trade</string>
     <string name="how_much_gold_do_you_want">How much Gold do you want?</string>
@@ -70,4 +69,7 @@
     <string name="_8000g">8000G</string>
     <string name="_10000g">10000G</string>
     <string name="zone">zone</string>
+    <string name="remember_me">Remember me</string>
+    <string name="coinz">COINZ</string>
+    <string name="developed_by_frederik_kelbel">developed by Frederik Kelbel</string>
 </resources>

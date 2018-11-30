@@ -96,21 +96,11 @@ public class BrowseandAcceptTest {
 
         ViewInteraction appCompatEditText = onView(
                 allOf(withId(R.id.enter_username),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                0),
                         isDisplayed()));
         appCompatEditText.perform(click());
 
         ViewInteraction appCompatEditText2 = onView(
                 allOf(withId(R.id.enter_username),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                0),
                         isDisplayed()));
         appCompatEditText2.perform(replaceText("testcase1"), closeSoftKeyboard());
 
@@ -125,41 +115,21 @@ public class BrowseandAcceptTest {
 
         ViewInteraction appCompatEditText3 = onView(
                 allOf(withId(R.id.enter_username), withText("testcase1"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                0),
                         isDisplayed()));
         appCompatEditText3.perform(pressImeActionButton());
 
         ViewInteraction appCompatEditText4 = onView(
                 allOf(withId(R.id.enter_password),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                1),
                         isDisplayed()));
         appCompatEditText4.perform(replaceText("testcase1"), closeSoftKeyboard());
 
         ViewInteraction appCompatEditText5 = onView(
                 allOf(withId(R.id.enter_password), withText("testcase1"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                1),
                         isDisplayed()));
         appCompatEditText5.perform(pressImeActionButton());
 
         ViewInteraction appCompatButton = onView(
                 allOf(withId(R.id.log_in_button), withText("Log in"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                2),
                         isDisplayed()));
         appCompatButton.perform(click());
 

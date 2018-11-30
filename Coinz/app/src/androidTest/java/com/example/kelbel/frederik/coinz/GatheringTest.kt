@@ -48,15 +48,15 @@ class GatheringTest {
     @JvmField
     var mGrantPermissionRule =
             GrantPermissionRule.grant(
-                    "android.permission.ACCESS_FINE_LOCATION")
+                    "android.permission.ACCESS_FINE_LOCATION")!!
 
-    fun getCurrentActivity(): Activity {
+    private fun getCurrentActivity(): Activity {
         val currentActivity = arrayOfNulls<Activity>(1)
-        getInstrumentation().runOnMainSync({
+        getInstrumentation().runOnMainSync {
             val resumedActivity = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED)
             val it = resumedActivity.iterator()
             currentActivity[0] = it.next()
-        })
+        }
 
         return currentActivity[0]!!
     }
@@ -85,21 +85,11 @@ class GatheringTest {
 
         val appCompatEditText = onView(
                 allOf(withId(R.id.enter_username),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(`is`("android.widget.LinearLayout")),
-                                        1),
-                                0),
                         isDisplayed()))
         appCompatEditText.perform(click())
 
         val appCompatEditText2 = onView(
                 allOf(withId(R.id.enter_username),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(`is`("android.widget.LinearLayout")),
-                                        1),
-                                0),
                         isDisplayed()))
         appCompatEditText2.perform(replaceText("testc"), closeSoftKeyboard())
 
@@ -110,21 +100,11 @@ class GatheringTest {
 
         val appCompatEditText3 = onView(
                 allOf(withId(R.id.enter_username), withText("testc"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(`is`("android.widget.LinearLayout")),
-                                        1),
-                                0),
                         isDisplayed()))
         appCompatEditText3.perform(replaceText("testcase1"))
 
         val appCompatEditText4 = onView(
                 allOf(withId(R.id.enter_username), withText("testcase1"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(`is`("android.widget.LinearLayout")),
-                                        1),
-                                0),
                         isDisplayed()))
         appCompatEditText4.perform(closeSoftKeyboard())
 
@@ -135,41 +115,21 @@ class GatheringTest {
 
         val appCompatEditText5 = onView(
                 allOf(withId(R.id.enter_username), withText("testcase1"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(`is`("android.widget.LinearLayout")),
-                                        1),
-                                0),
                         isDisplayed()))
         appCompatEditText5.perform(pressImeActionButton())
 
         val appCompatEditText6 = onView(
                 allOf(withId(R.id.enter_password),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(`is`("android.widget.LinearLayout")),
-                                        1),
-                                1),
                         isDisplayed()))
         appCompatEditText6.perform(replaceText("testcase1"), closeSoftKeyboard())
 
         val appCompatEditText7 = onView(
                 allOf(withId(R.id.enter_password), withText("testcase1"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(`is`("android.widget.LinearLayout")),
-                                        1),
-                                1),
                         isDisplayed()))
         appCompatEditText7.perform(pressImeActionButton())
 
         val appCompatButton = onView(
                 allOf(withId(R.id.log_in_button), withText("Log in"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(`is`("android.widget.LinearLayout")),
-                                        1),
-                                2),
                         isDisplayed()))
         appCompatButton.perform(click())
 

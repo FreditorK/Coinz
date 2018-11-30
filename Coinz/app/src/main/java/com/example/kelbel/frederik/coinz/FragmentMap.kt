@@ -12,6 +12,7 @@ import android.os.*
 import android.support.annotation.VisibleForTesting
 import android.support.v4.app.Fragment
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,7 +47,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
     private var markerAnimator: ValueAnimator? = null//markeranimator for movingsac event
     private var countDownTimer: CountDownTimer? = null//countdowntimer for movingsac event
 
-    private lateinit var map: MapboxMap
+    private var map: MapboxMap? = null
     private lateinit var permissionsManager: PermissionsManager
     private var locationEngine: LocationEngine? = null
     private var locationLayerPlugin: LocationLayerPlugin? = null
@@ -81,15 +82,9 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
         mapView.getMapAsync { mapboxMap ->
             //load map
             map = mapboxMap
-            map.uiSettings.isCompassEnabled = true
-            drawPolygon(map)
-            for (n in ProfileActivity.nastycoins) {//add coins to map with individual icons displaying them as groups of coins according to value
-                val icon: Icon = IconFactory.getInstance(activity!!.applicationContext).fromBitmap(BitmapFactory.decodeResource(resources, getFittingIconId(n)))
-                map.addMarker(MarkerOptions().setIcon(icon)
-                        .position(LatLng(n.coordinates.second, n.coordinates.first))
-                        .title(n.id)
-                        .snippet(n.value.toString()))
-            }
+            map?.uiSettings?.isCompassEnabled = true
+            map?.uiSettings?.compassGravity = Gravity.BOTTOM
+            map?.uiSettings?.setCompassMargins(0,0,0, 80)
             enableLocation()
         }
         //display currently gathered coins
@@ -101,70 +96,92 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
         displayWalletValues()
     }
 
-    private fun drawPolygon(mapboxMap: MapboxMap) {//draw zones grid
-        for (r in 0..4) {
-            for (c in 0..4) {
-                val polygon = ArrayList<LatLng>()
-                polygon.add(LatLng(rows[r], columns[c]))
-                polygon.add(LatLng(rows[r], columns[c + 1]))
-                polygon.add(LatLng(rows[r + 1], columns[c + 1]))
-                polygon.add(LatLng(rows[r + 1], columns[c]))
-                mapboxMap.addPolygon(PolygonOptions().alpha(0.5f).strokeColor(Color.parseColor("#00ffffff"))
-                        .addAll(polygon))
+    fun addMarkers(){
+        if(map != null) {
+            for (n in ProfileActivity.nastycoins) {//add coins to map with individual icons displaying them as groups of coins according to value
+                val icon: Icon = IconFactory.getInstance(activity!!.applicationContext).fromBitmap(BitmapFactory.decodeResource(resources, getFittingIconId(n)))
+                map!!.addMarker(MarkerOptions().setIcon(icon)
+                        .position(LatLng(n.coordinates.second, n.coordinates.first))
+                        .title(n.id)
+                        .snippet(n.value.toString()))
             }
+        }else{//wait 2 seconds to retry if map does not load
+            Handler().postDelayed({
+                addMarkers()
+            }, 2000)
         }
+    }
 
-        val ref = FirebaseFirestore.getInstance()
+    fun drawPolygon() {//draw zones grid
+        if(map != null) {
+            for (r in 0..4) {
+                for (c in 0..4) {
+                    val polygon = ArrayList<LatLng>()
+                    polygon.add(LatLng(rows[r], columns[c]))
+                    polygon.add(LatLng(rows[r], columns[c + 1]))
+                    polygon.add(LatLng(rows[r + 1], columns[c + 1]))
+                    polygon.add(LatLng(rows[r + 1], columns[c]))
+                    map!!.addPolygon(PolygonOptions().alpha(0.35f).strokeColor(Color.parseColor("#00ffffff"))
+                            .addAll(polygon))
+                }
+            }
 
-        for (num in 0..24) {//retrieve colors for the respective zones and shape barplot in subfragmentaccount
-            ref.collection("zones").document(num.toString())
-                    .get()
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            val document = task.result
-                            if (document!!.exists()) {
-                                val c = document.getLong("c")!!.toInt()
-                                mapboxMap.polygons[num].fillColor = c
-                                if (cbs.contains(c)) {
-                                    SubFragmentAccount.carversize += 1
+            val ref = FirebaseFirestore.getInstance()
+
+            for (num in 0..24) {//retrieve colors for the respective zones and shape barplot in subfragmentaccount
+                ref.collection("zones").document(num.toString())
+                        .get()
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val document = task.result
+                                if (document!!.exists()) {
+                                    val c = document.getLong("c")!!.toInt()
+                                    map!!.polygons[num].fillColor = c
+                                    if (cbs.contains(c)) {
+                                        SubFragmentAccount.carversize += 1
+                                    } else {
+                                        SubFragmentAccount.creepersize += 1
+                                    }
+                                    (fragmentManager?.findFragmentByTag("A") as FragmentDepot).getAccount()?.updateBars()
                                 } else {
-                                    SubFragmentAccount.creepersize += 1
+                                    Toast.makeText(this.context, "Check your Connection!", Toast.LENGTH_SHORT).show()
                                 }
-                                (fragmentManager?.findFragmentByTag("A") as FragmentDepot).getAccount()?.updateBars()
                             } else {
                                 Toast.makeText(this.context, "Check your Connection!", Toast.LENGTH_SHORT).show()
                             }
-                        } else {
-                            Toast.makeText(this.context, "Check your Connection!", Toast.LENGTH_SHORT).show()
                         }
-                    }
-        }
+            }
 
-        //listen for updates in zone colors, in case someone buys a zone for their team and shape barplot accordingly
-        FirebaseFirestore.getInstance().collection("zones")
-                .addSnapshotListener(EventListener { documentSnapshots, e ->
-                    if (e != null) {
-                        Log.e("TeamZone", "Listen failed!", e)
-                        return@EventListener
-                    }
+            //listen for updates in zone colors, in case someone buys a zone for their team and shape barplot accordingly
+            FirebaseFirestore.getInstance().collection("zones")
+                    .addSnapshotListener(EventListener { documentSnapshots, e ->
+                        if (e != null) {
+                            Log.e("TeamZone", "Listen failed!", e)
+                            return@EventListener
+                        }
 
-                    if (documentSnapshots != null) {
-                        for (doc in documentSnapshots.documentChanges) {
-                            if (doc.type == DocumentChange.Type.MODIFIED) {
-                                val c = doc.document.getLong("c")!!.toInt()
-                                mapboxMap.polygons[doc.document.id.toInt()].fillColor = c
-                                if (cbs.contains(c)) {
-                                    SubFragmentAccount.carversize += 1
-                                    SubFragmentAccount.creepersize -= 1
-                                } else {
-                                    SubFragmentAccount.creepersize += 1
-                                    SubFragmentAccount.carversize -= 1
+                        if (documentSnapshots != null) {
+                            for (doc in documentSnapshots.documentChanges) {
+                                if (doc.type == DocumentChange.Type.MODIFIED) {
+                                    val c = doc.document.getLong("c")!!.toInt()
+                                    map!!.polygons[doc.document.id.toInt()].fillColor = c
+                                    if (cbs.contains(c)) {
+                                        SubFragmentAccount.carversize += 1
+                                        SubFragmentAccount.creepersize -= 1
+                                    } else {
+                                        SubFragmentAccount.creepersize += 1
+                                        SubFragmentAccount.carversize -= 1
+                                    }
+                                    (fragmentManager?.findFragmentByTag("A") as FragmentDepot).getAccount()?.updateBars()
                                 }
-                                (fragmentManager?.findFragmentByTag("A") as FragmentDepot).getAccount()?.updateBars()
                             }
                         }
-                    }
-                })
+                    })
+        }else{//wait 2 seconds to retry if map does not load
+            Handler().postDelayed({
+                    drawPolygon()
+            }, 2000)
+        }
     }
 
     private fun displayWalletValues() {//update displayed wallet
@@ -175,41 +192,49 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
     }
 
     private fun getFittingIconId(n: NastyCoin): Int {//Get the Icon to display on the map from Coin
-        return resources.getIdentifier(n.currency + n.marker_symbol, "mipmap", context?.packageName)
+        return resources.getIdentifier(n.currency + n.markersymbol, "mipmap", context?.packageName)
     }
 
     fun addMovingSac(list: ArrayList<LatLng>, durations: ArrayList<Long>) {//adds moving sac to the map
-        val icon: Icon = IconFactory.getInstance(activity!!.applicationContext).fromBitmap(BitmapFactory.decodeResource(resources, R.mipmap.movingsac))
-        marker = map.addMarker(MarkerOptions().setIcon(icon)
-                .position(list[0])
-                .title("Catch me!"))
-        markerAnimator = ObjectAnimator.ofObject(marker, "position", LatLngEvaluator(), list[0], list[1])
-        updateMovingSac(list, durations, 0)
-        timer.visibility = View.VISIBLE
-        countDownTimer = object : CountDownTimer(durations.sum(), 1000) {
-            //sets timer for event
-            override fun onTick(p0: Long) {
-                timer.text = "Event finishes in: " + p0 / 1000 + "s"
-                if (p0 / 1000 < 10) {
-                    changeColor()
+        if(map != null) {
+            val icon: Icon = IconFactory.getInstance(activity!!.applicationContext).fromBitmap(BitmapFactory.decodeResource(resources, R.mipmap.movingsac))
+            marker = map!!.addMarker(MarkerOptions().setIcon(icon)
+                    .position(list[0])
+                    .title("Catch me!"))
+            markerAnimator = ObjectAnimator.ofObject(marker, "position", LatLngEvaluator(), list[0], list[1])
+            updateMovingSac(list, durations, 0)
+            timer.visibility = View.VISIBLE
+            countDownTimer = object : CountDownTimer(durations.sum(), 1000) {
+                //sets timer for event
+                override fun onTick(p0: Long) {
+                    timer.text = "Event finishes in: " + p0 / 1000 + "s"
+                    if (p0 / 1000 < 10) {
+                        changeColor()
+                    }
                 }
-            }
 
-            override fun onFinish() {//failing to collect it
-                timer.setTextColor(Color.WHITE)
-                timer.text = "You missed your chance for today."
-                SubFragmentEvents.eventAvailability = false
-                timer.visibility = View.GONE
-            }
-
-            fun changeColor() {//change color of timer in final seconds
-                if (timer.currentTextColor == Color.RED) {
+                override fun onFinish() {//failing to collect it
                     timer.setTextColor(Color.WHITE)
-                } else {
-                    timer.setTextColor(Color.RED)
+                    timer.text = "You missed your chance for today."
+                    SubFragmentEvents.eventAvailability = false
+                    Handler().postDelayed({
+                        timer.visibility = View.GONE
+                    }, 3000)
                 }
-            }
-        }.start()
+
+                fun changeColor() {//change color of timer in final seconds
+                    if (timer.currentTextColor == Color.RED) {
+                        timer.setTextColor(Color.WHITE)
+                    } else {
+                        timer.setTextColor(Color.RED)
+                    }
+                }
+            }.start()
+        }else{//wait 2 seconds to retry if map does not load
+            Handler().postDelayed({
+                addMovingSac(list, durations)
+            }, 2000)
+        }
     }
 
     fun updateMovingSac(list: ArrayList<LatLng>, durations: ArrayList<Long>, count: Int) {//recursive function so that the sac changes direction of movement
@@ -221,8 +246,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
                     markerAnimator = ObjectAnimator.ofObject(marker, "position", LatLngEvaluator(), list[count + 1], list[count + 2])
                     updateMovingSac(list, durations, count + 1)
                 } else {//finish
-                    markerAnimator?.end()
-                    map.removeMarker(marker!!)
+                    map?.removeMarker(marker!!)
                 }
             }
         })
@@ -237,7 +261,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
             if (checkIfValidZone(ProfileActivity.nastycoins[a].coordinates)) {//check if coin is in zone of your team
                 ProfileActivity.collect(ProfileActivity.nastycoins[a])
                 ProfileActivity.nastycoins.removeAt(a)
-                map.removeMarker(map.markers[a])
+                map!!.removeMarker(map!!.markers[a])
                 displayWalletValues()
             } else {
                 Toast.makeText(this.context, "These coins are not in a zone your team controls!", Toast.LENGTH_SHORT).show()
@@ -256,7 +280,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
             if (b.second < rows[i] && b.second >= rows[i + 1]) {
                 for (k in 0..4) {
                     if (b.first > columns[k] && b.first <= columns[k + 1]) {
-                        return if (cbs.contains(map.polygons[i * 5 + k].fillColor)) {
+                        return if (cbs.contains(map!!.polygons[i * 5 + k].fillColor)) {
                             ProfileActivity.team == 1
                         } else {
                             ProfileActivity.team == 0
@@ -270,7 +294,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
 
     //Location, Map
     private fun setCameraPosition(location: Location) {//adjusts camera location according to current location
-        map.animateCamera(CameraUpdateFactory.newLatLng(LatLng(location.latitude, location.longitude)))
+        map!!.animateCamera(CameraUpdateFactory.newLatLng(LatLng(location.latitude, location.longitude)))
     }
 
     private fun enableLocation() {
@@ -379,7 +403,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
 
     @SuppressWarnings("MissingPermission")
     private fun initLocationLayer() {
-        locationLayerPlugin = LocationLayerPlugin(mapView, map, locationEngine)
+        locationLayerPlugin = LocationLayerPlugin(mapView, map!!, locationEngine)
         locationLayerPlugin?.apply {
             setLocationLayerEnabled(true)
             cameraMode = CameraMode.TRACKING
@@ -396,7 +420,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
             latLng.longitude = startValue.longitude + (endValue.longitude - startValue.longitude) * fraction
             if (latLng.latitude < lastLocation!!.latitude + 0.0002f && latLng.latitude > lastLocation!!.latitude - 0.0002f && latLng.longitude > lastLocation!!.longitude - 0.0002f && latLng.longitude < lastLocation!!.longitude + 0.0002f) {
                 markerAnimator?.end()
-                map.removeMarker(marker!!)
+                map!!.removeMarker(marker!!)
                 ProfileActivity.catchMovingSac()
                 displayWalletValues()
                 countDownTimer?.cancel()

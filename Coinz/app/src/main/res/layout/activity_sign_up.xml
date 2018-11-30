@@ -8,49 +8,53 @@
     <ImageView
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_marginBottom="10dp"
         android:src="@mipmap/launchericon"
         android:contentDescription="@string/launchericon" />
+    <!-- shows progress of signing up -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp">
+            android:layout_margin="30dp">
             <!-- enter username for sign up -->
             <EditText
                 android:id="@+id/edit_username"
+                android:drawableStart="@drawable/ic_action_user"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
                 android:hint="@string/username"
-                android:textAlignment="center"
+                android:drawablePadding="10dp"
                 android:inputType="textPersonName"
-                android:paddingBottom="15dp"
                 android:textColorHint="@color/colorAccent"
                 tools:ignore="Autofill" /><!-- autofill is only supported for oreo -->
             <!-- enter password for sign up -->
             <EditText
                 android:id="@+id/edit_password"
+                android:drawableStart="@drawable/ic_action_lock_closed2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
                 android:hint="@string/password"
-                android:textAlignment="center"
+                android:drawablePadding="10dp"
                 android:inputType="textPassword"
-                android:paddingBottom="15dp"
                 android:textColorHint="@color/colorAccent"
                 tools:ignore="Autofill" /><!-- autofill is only supported for oreo -->
             <!-- repeat password for sign up -->
             <EditText
                 android:id="@+id/repeat_password"
+                android:drawableStart="@drawable/ic_action_lock_closed2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
                 android:hint="@string/confirm_password"
-                android:textAlignment="center"
+                android:drawablePadding="10dp"
                 android:inputType="textPassword"
-                android:paddingBottom="15dp"
                 android:textColorHint="@color/colorAccent"
                 tools:ignore="Autofill" /><!-- autofill is only supported for oreo -->
             <!-- spinner to select team -->
@@ -80,11 +84,5 @@
                 android:textAlignment="center"
                 android:textColor="@color/colorAccent"/>
         </LinearLayout>
-    <!-- shows progress of signing up -->
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"/>
 
 </LinearLayout>

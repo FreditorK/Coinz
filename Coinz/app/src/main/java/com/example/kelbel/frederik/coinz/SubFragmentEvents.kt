@@ -44,8 +44,10 @@ class SubFragmentEvents : Fragment() {
                     k = k2
                     i += d
                 }
-                (this@SubFragmentEvents.activity as ProfileActivity).displayFragmentMap()//go to map fragment
+                val v = (this@SubFragmentEvents.activity as ProfileActivity).bottomNavigationView?.findViewById<View>(R.id.map_tab)//go to map fragment
+                v?.performClick()
                 (fragmentManager?.findFragmentByTag("B") as FragmentMap).addMovingSac(list, durations)//start event
+                eventAvailability = false
             } else {
                 catchMeIfyouCan.setEnabledDrawable(getDrawable(this@SubFragmentEvents.context!!, R.mipmap.denied))//event has already been run today
             }

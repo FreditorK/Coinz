@@ -15,7 +15,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class DownloadFileTask : AsyncTask<String, Void, String>() {//downloads current exchange rate and current map
+class DownloadFileTask(private val onCompleted: OnCompleted) : AsyncTask<String, Void, String>() {//downloads current exchange rate and current map
 
     companion object {
 
@@ -38,7 +38,7 @@ class DownloadFileTask : AsyncTask<String, Void, String>() {//downloads current 
                 n.id = k.getJSONObject("properties").getString("id")
                 n.value = k.getJSONObject("properties").getString("value").toFloat()
                 n.currency = k.getJSONObject("properties").getString("currency").toLowerCase()
-                n.marker_symbol = k.getJSONObject("properties").getString("marker-symbol")
+                n.markersymbol = k.getJSONObject("properties").getString("marker-symbol")
                 n.coordinates = stringToCoordinates(k.getJSONObject("geometry").getString("coordinates"))
                 nastycoins.add(n)
             }
@@ -94,6 +94,7 @@ class DownloadFileTask : AsyncTask<String, Void, String>() {//downloads current 
         val todaysExchangeRate = retrieveCoinExchangerates(json)
         ProfileActivity.coinExchangeRates!!.add(todaysExchangeRate)
 
+        onCompleted.onTaskCompleted()
         //call additional async task for graphs in exchange tab
         DownloadExchangeRates().execute("http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 86400000L)) + "/coinzmap.geojson",
                 "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 172800000L)) + "/coinzmap.geojson",
