@@ -99,7 +99,7 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
     fun addMarkers(){
         if(map != null) {
             for (n in ProfileActivity.nastycoins) {//add coins to map with individual icons displaying them as groups of coins according to value
-                val icon: Icon = IconFactory.getInstance(activity!!.applicationContext).fromBitmap(BitmapFactory.decodeResource(resources, getFittingIconId(n)))
+                val icon: Icon = IconFactory.getInstance(this.context!!).fromBitmap(BitmapFactory.decodeResource(resources, getFittingIconId(n)))
                 map!!.addMarker(MarkerOptions().setIcon(icon)
                         .position(LatLng(n.coordinates.second, n.coordinates.first))
                         .title(n.id)

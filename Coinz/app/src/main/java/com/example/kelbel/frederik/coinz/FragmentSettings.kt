@@ -25,6 +25,7 @@ import com.mapbox.mapboxsdk.Mapbox.getApplicationContext
 import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
+import com.google.gson.Gson
 
 
 class FragmentSettings : Fragment() {
@@ -137,13 +138,41 @@ class FragmentSettings : Fragment() {
         username?.text = user?.email?.substringBefore('@')
     }
 
-    private fun restartApp() {//restarts app
-        val intent = Intent(getApplicationContext(), MainActivity::class.java)
-        val mPendingIntentId = System.currentTimeMillis().toInt()
-        val mPendingIntent = PendingIntent.getActivity(getApplicationContext(), mPendingIntentId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
-        val mgr = getApplicationContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent)
-        System.exit(0)
+    private fun restartApp() {//restarts app and saves beforehand
+        val user = FirebaseAuth.getInstance().currentUser?.email.toString()
+        if(!ProfileActivity.isTest) {
+            val gson = Gson()
+            val sharedprefsEditor = this.context?.getSharedPreferences("General", Context.MODE_PRIVATE)?.edit()
+            sharedprefsEditor?.putString("ER", gson.toJson(ProfileActivity.coinExchangeRates))
+            sharedprefsEditor?.apply()
+
+            //firestore automatically retries to update if connection is bad, otherwise automatically stored in cache
+            val db = FirebaseFirestore.getInstance().collection("users").document(user)
+            db.update("lD", ProfileActivity.downloadDate)
+                    .addOnSuccessListener {
+                        db.update("exchangeCount", ProfileActivity.exchangedCount)
+                                .addOnSuccessListener {
+                                    db.update("gold", ProfileActivity.gold)
+                                            .addOnSuccessListener {
+                                                db.update("wallet", gson.toJson(ProfileActivity.wallet))
+                                                        .addOnSuccessListener {
+                                                            db.update("nastycoins", gson.toJson(ProfileActivity.nastycoins))
+                                                                    .addOnSuccessListener {
+                                                                        db.update("movingSac", SubFragmentEvents.eventAvailability)
+                                                                                .addOnSuccessListener {
+                                                                                    val intent = Intent(getApplicationContext(), MainActivity::class.java)
+                                                                                    val mPendingIntentId = System.currentTimeMillis().toInt()
+                                                                                    val mPendingIntent = PendingIntent.getActivity(getApplicationContext(), mPendingIntentId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+                                                                                    val mgr = getApplicationContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                                                                                    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent)
+                                                                                    System.exit(0)
+                                                                                }
+                                                                    }
+                                                        }
+                                            }
+                                }
+                    }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {//on activity result after selecting profile picture from gallery

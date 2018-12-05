@@ -95,11 +95,11 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
                         }
                     }
 
-                    fRecyclerAdapter!!.notifyDataSetChanged()
+                    fRecyclerAdapter!!.notifyDataSetChanged()//update date in adapter
                     mRecyclerView.adapter = fRecyclerAdapter
                 })
 
-        if (filter == "") {
+        if (filter == "") {//if nothing was entered as filter, do not filter anything
             bool = true
         }
     }
@@ -108,16 +108,16 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
         var d = 0.0
         when (s) {
             "shil" -> {
-                d = ProfileActivity.coinExchangeRates!![0].SHIL.toDouble()
+                d = ProfileActivity.coinExchangeRates[0].SHIL.toDouble()
             }
             "dolr" -> {
-                d = ProfileActivity.coinExchangeRates!![0].DOLR.toDouble()
+                d = ProfileActivity.coinExchangeRates[0].DOLR.toDouble()
             }
             "quid" -> {
-                d = ProfileActivity.coinExchangeRates!![0].QUID.toDouble()
+                d = ProfileActivity.coinExchangeRates[0].QUID.toDouble()
             }
             "peny" -> {
-                d = ProfileActivity.coinExchangeRates!![0].PENY.toDouble()
+                d = ProfileActivity.coinExchangeRates[0].PENY.toDouble()
             }
         }
         return d
@@ -144,26 +144,26 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
                         holder.gold?.text = "Price: " + roundToDecimals(o.gold!!, 1).toString()
                         holder.worth?.text = "Current worth: " + roundToDecimals(o.worth, 1).toString()
                         holder.swipeButton?.setOnStateChangeListener {
-                            if (o.gold!! <= ProfileActivity.gold) {//execute trade
+                            if (o.gold!! <= ProfileActivity.gold && !holder.executed) {//execute trade
+                                holder.executed = true
                                 executeOrder66(o)
                             } else {//not enough gold to execute
                                 holder.swipeButton?.setEnabledDrawable(getDrawable(R.mipmap.denied))
-                                Toast.makeText(baseContext, "Not enough gold in depot!", Toast.LENGTH_SHORT).show()
                             }
                         }
                         //exclusively for test purposes
-                        ProfileActivity.h = holder
+                        ProfileActivity.h = holder //espresso cannot handle swipebuttons
                         //-----------------------------
                         //add coins to expandable list in layout
                         val noOfChildTextViews = holder.childitems?.childCount
                         val noOfChild = o.children!!.size
                         if (noOfChild < noOfChildTextViews!!) {
-                            for (index in noOfChild until noOfChildTextViews) {
+                            for (index in noOfChild until noOfChildTextViews) {//hide all coins items/unexpanded
                                 val currentView = holder.childitems?.getChildAt(index) as LinearLayout
                                 currentView.visibility = View.GONE
                             }
                         }
-                        for (ViewIndex in 0 until noOfChild) {
+                        for (ViewIndex in 0 until noOfChild) {//put data into coin item views
                             val currentView = holder.childitems?.getChildAt(ViewIndex) as LinearLayout
                             (currentView.getChildAt(0) as ImageView).setImageResource(o.children?.get(ViewIndex)?.picRef!!)
                             val sublayout = currentView.getChildAt(1) as LinearLayout
@@ -193,7 +193,7 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
                         .get()
                         .addOnSuccessListener {
                             //update gold of trade offerer
-                            val currentPlus = it.getDouble("plus")
+                            val currentPlus = it.getDouble("plus")//plus has a listener on it in depot ==> updates gold if changes
                             FirebaseFirestore.getInstance().collection("users").document(offer.user.toString())
                                     .update("plus", currentPlus!! + offer.gold!!)
                                     .addOnSuccessListener {
@@ -217,15 +217,17 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
                                     }
                                     .addOnFailureListener { e ->
                                         Log.w("Browse_Offers", "Error updating gold status", e)
+                                        Toast.makeText(applicationContext, "Trade could not be executed. Try again later.", Toast.LENGTH_SHORT).show()
                                     }
                         }
                         .addOnFailureListener { e ->
                             Log.w("Browse_Offers", "Error receiving gold status", e)
+                            Toast.makeText(applicationContext, "Trade could not be executed. Try again later.", Toast.LENGTH_SHORT).show()
                         }
             }
         }
 
-        fRecyclerAdapter!!.notifyDataSetChanged()
+        fRecyclerAdapter!!.notifyDataSetChanged()//update data in adapter
         mRecyclerView.adapter = fRecyclerAdapter
     }
 
@@ -237,6 +239,7 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
         var gold: TextView? = null//price
         var worth: TextView? = null//current worth of the coins
         var childitems: LinearLayout? = null//contains coins in offer
+        var executed: Boolean = false//prohibits onstatechange to be called multiple times
 
         init {
             if (offerList.size > 0) {

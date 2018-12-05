@@ -54,8 +54,16 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    private fun letterorDigit(s : String) : Boolean{
+        var bool = false
+        for (c in s) {
+                bool = bool || !c.isLetterOrDigit()
+        }
+        return bool
+    }
+
     private fun register() {//called on sign up button click
-        val username: String = editusername?.text.toString().trim() + "@useless.com"
+        var username: String = editusername?.text.toString().trim().toLowerCase()
         val password: String = editpassword?.text.toString().trim()
         val rpassword: String = repeatpassword?.text.toString().trim()
 
@@ -65,17 +73,23 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener {
             editusername?.requestFocus()
             return
         }
+        if (letterorDigit(username)) {
+            editusername?.error = "Your username can only consist of letters and digits"
+            editusername?.requestFocus()
+            return
+        }
         if (password.length < 5) {
             editpassword?.error = "Password is to short"
             editpassword?.requestFocus()
             return
         }
         if (password != rpassword) {
-            editpassword?.error = "Password does not match password confirmation"
-            editpassword?.requestFocus()
+            repeatpassword?.error = "Confirmation does not match password"
+            repeatpassword?.requestFocus()
             return
         }
 
+        username += "@useless.com"
         progressBar?.visibility = View.VISIBLE//loading circle becomes visible
 
         firebaseAuth?.createUserWithEmailAndPassword(username, password)?.addOnCompleteListener { task ->
@@ -102,7 +116,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener {
     private fun setUpUserAccount(username: String) {// Creates a new user profile
         val user = HashMap<String, Any>()
         val gson = Gson()
-        user["user"] = username
+        user["user"] = username.toLowerCase()
         user["lD"] = "" //last date of map download
         user["exchangeCount"] = 0 //number of exchanged coins today
         user["gold"] = 0.0f //gold in the bank
@@ -110,7 +124,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener {
         user["nastycoins"] = gson.toJson(arrayListOf<NastyCoin>())//coins available for collection
         user["movingSac"] = true//moving sac event available
         user["team"] = selectedTeam//set selected team
-        user["plus"] = 0 //plus in gold from trade, increases when offer accepted
+        user["plus"] = 0.0f //plus in gold from trade, increases when offer accepted
 
         // Add user to firestore and set up variables in ProfileActivity
         FirebaseFirestore.getInstance().collection("users").document(username)

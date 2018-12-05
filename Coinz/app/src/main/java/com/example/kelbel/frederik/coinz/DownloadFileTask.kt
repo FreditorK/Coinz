@@ -1,7 +1,6 @@
 package com.example.kelbel.frederik.coinz
 
 import android.os.AsyncTask
-import android.util.Log
 import org.apache.commons.io.IOUtils
 import org.json.JSONArray
 import org.json.JSONObject
@@ -10,24 +9,12 @@ import java.io.InputStream
 import java.io.StringWriter
 import java.net.HttpURLConnection
 import java.net.URL
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.collections.ArrayList
 
 
 class DownloadFileTask(private val onCompleted: OnCompleted) : AsyncTask<String, Void, String>() {//downloads current exchange rate and current map
 
     companion object {
-
-        fun retrieveCoinExchangerates(json: JSONObject): CoinExchangeRates {//retrieves exchange rates
-            val values = CoinExchangeRates(0f, 0f, 0f, 0f, Date())
-            values.SHIL = json.getJSONObject("rates").getString("SHIL").toFloat()
-            values.DOLR = json.getJSONObject("rates").getString("DOLR").toFloat()
-            values.QUID = json.getJSONObject("rates").getString("QUID").toFloat()
-            values.PENY = json.getJSONObject("rates").getString("PENY").toFloat()
-            values.date = SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).parse(ProfileActivity.downloadDate)
-            return values
-        }
 
         fun retrieveCoins(json: JSONObject): ArrayList<NastyCoin> {//retrieves all coins on the map
             val nastycoins: ArrayList<NastyCoin> = ArrayList()
@@ -85,22 +72,10 @@ class DownloadFileTask(private val onCompleted: OnCompleted) : AsyncTask<String,
     }
 
     private fun doStuff(s: String) {
-        Log.d("Giraffe", s)
         val json = JSONObject(s)
 
         ProfileActivity.nastycoins = retrieveCoins(json)
 
-        ProfileActivity.coinExchangeRates = ArrayList()
-        val todaysExchangeRate = retrieveCoinExchangerates(json)
-        ProfileActivity.coinExchangeRates!!.add(todaysExchangeRate)
-
-        onCompleted.onTaskCompleted()
-        //call additional async task for graphs in exchange tab
-        DownloadExchangeRates().execute("http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 86400000L)) + "/coinzmap.geojson",
-                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 172800000L)) + "/coinzmap.geojson",
-                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 259200000L)) + "/coinzmap.geojson",
-                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 345600000L)) + "/coinzmap.geojson",
-                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 432000000L)) + "/coinzmap.geojson",
-                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(todaysExchangeRate.date.time - 518400000L)) + "/coinzmap.geojson")
+        onCompleted.onTaskCompleted()//callback to ProfileActivity
     }
 }

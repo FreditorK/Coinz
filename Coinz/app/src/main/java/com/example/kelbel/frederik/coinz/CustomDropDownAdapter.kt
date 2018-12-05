@@ -15,7 +15,7 @@ class CustomDropDownAdapter(val context: Context, private var listItemsTxt: Arra
         val view: View
         val vh: ItemRowHolder
         if (convertView == null) {
-            view = mInflater.inflate(R.layout.spinner_item, parent, false)
+            view = mInflater.inflate(R.layout.spinner_item, parent, false)//assign spinner layout
             vh = ItemRowHolder(view)
             view?.tag = vh
         } else {
@@ -23,6 +23,7 @@ class CustomDropDownAdapter(val context: Context, private var listItemsTxt: Arra
             vh = view.tag as ItemRowHolder
         }
 
+        //set layout parameter of spinner items
         val params = view.layoutParams
         params.height = 150
         view.layoutParams = params

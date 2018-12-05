@@ -44,11 +44,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private fun login() {//called when log in button is clicked
 
         //retrieve info from edittexts
-        val username: String = enterusername?.text.toString().trim() + "@useless.com"
+        val username: String = enterusername?.text.toString().trim().toLowerCase() + "@useless.com"
         val password: String = enterpassword?.text.toString().trim()
 
         //check if username meets requirements
-        if (username.isEmpty()) {
+        if (enterusername?.text.toString().trim().isEmpty()) {
             enterusername?.error = "Please enter a username"
             enterusername?.requestFocus()
             return

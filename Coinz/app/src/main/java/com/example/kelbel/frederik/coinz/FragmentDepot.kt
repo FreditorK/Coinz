@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.EventListener
@@ -81,6 +82,7 @@ class FragmentDepot : Fragment() {
             }
         }
 
+        //live updates on gold in case of a trade offer being accepted
         FirebaseFirestore.getInstance().collection("users").document(user?.email.toString())
                 .addSnapshotListener(EventListener { documentSnapshot, e ->
                     if (e != null) {
@@ -89,8 +91,14 @@ class FragmentDepot : Fragment() {
                     }
 
                     if (documentSnapshot != null) {
-                        ProfileActivity.gold += documentSnapshot.getDouble("plus")!!.toFloat()
-                        goldtext?.text = ProfileActivity.gold.toString()
+                        val plus = documentSnapshot.getDouble("plus")!!.toFloat()
+                        if(plus > 0) {//tell the user when an offer was accepted
+                            ProfileActivity.gold += plus
+                            goldtext?.text = ProfileActivity.gold.toString()
+                            documentSnapshot.reference.update("plus", 0)
+                            Toast.makeText(this.context, "Your offer/s was/were accepted. You received " + plus.toString() + " gold.", Toast.LENGTH_LONG).show()
+                        }
+
                     }
                 })
     }

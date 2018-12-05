@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -19,6 +20,7 @@ class MakeanOffer : AppCompatActivity(), AdapterView.OnItemClickListener, View.O
     private lateinit var submitbutton: Button//submit offer
     private lateinit var backbutton: Button//cancel offer and go back to depot
     private lateinit var simpleAdapter: SimpleAdapter//adapter for the listview containing the coins
+    private lateinit var colors: ArrayList<Int>// stores colors (selected/unselected) of items in list because listview recycles layouts
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +34,7 @@ class MakeanOffer : AppCompatActivity(), AdapterView.OnItemClickListener, View.O
         for (i in ProfileActivity.wallet.shilCoins) {
             val hm = HashMap<String, String>()
             hm["listview_title"] = i.id
-            hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates!![0].SHIL).toString()
+            hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates[0].SHIL).toString()
             hm["listview_image"] = getFittingIconId(i).toString()
             aList.add(hm)
             listCoins.add(i)
@@ -40,7 +42,7 @@ class MakeanOffer : AppCompatActivity(), AdapterView.OnItemClickListener, View.O
         for (i in ProfileActivity.wallet.dolrCoins) {
             val hm = HashMap<String, String>()
             hm["listview_title"] = i.id
-            hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates!![0].DOLR).toString()
+            hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates[0].DOLR).toString()
             hm["listview_image"] = getFittingIconId(i).toString()
             aList.add(hm)
             listCoins.add(i)
@@ -48,7 +50,7 @@ class MakeanOffer : AppCompatActivity(), AdapterView.OnItemClickListener, View.O
         for (i in ProfileActivity.wallet.quidCoins) {
             val hm = HashMap<String, String>()
             hm["listview_title"] = i.id
-            hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates!![0].QUID).toString()
+            hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates[0].QUID).toString()
             hm["listview_image"] = getFittingIconId(i).toString()
             aList.add(hm)
             listCoins.add(i)
@@ -56,15 +58,25 @@ class MakeanOffer : AppCompatActivity(), AdapterView.OnItemClickListener, View.O
         for (i in ProfileActivity.wallet.penyCoins) {
             val hm = HashMap<String, String>()
             hm["listview_title"] = i.id
-            hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates!![0].PENY).toString()
+            hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates[0].PENY).toString()
             hm["listview_image"] = getFittingIconId(i).toString()
             aList.add(hm)
             listCoins.add(i)
         }
         //set up adapter
+        colors = ArrayList()
+        for(i in 0 until listCoins.size){
+            colors.add(R.color.colorPrimaryDark)
+        }
         val from = arrayOf("listview_image", "listview_title", "listview_discription")
         val to = intArrayOf(R.id.listview_image, R.id.listview_item_title, R.id.listview_item_short_description)
-        simpleAdapter = SimpleAdapter(baseContext, aList, R.layout.list_item, from, to)
+        simpleAdapter = object : SimpleAdapter(baseContext, aList, R.layout.list_item, from, to){
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {//overwriting is needed because listview recycles list item layouts
+                val view = super.getView(position, convertView, parent)
+                view.background = getDrawable(colors[position])//assign color back to view when view enters screen again
+                return view
+            }
+        }
         //set up listview
         val androidListView = findViewById<ListView>(R.id.list_view)
         androidListView.adapter = simpleAdapter
@@ -84,9 +96,11 @@ class MakeanOffer : AppCompatActivity(), AdapterView.OnItemClickListener, View.O
     private fun selectOrUnselect(view: View?, pos: Int) {//manages selecting and unselecting coins for the offer
         if (selectedCoins.contains(listCoins[pos])) {//unselect
             view?.background = getDrawable(R.color.colorPrimaryDark)
+            colors[pos] = R.color.colorPrimaryDark
             selectedCoins.remove(listCoins[pos])
         } else {//select
             view?.background = getDrawable(R.color.colorAccent)
+            colors[pos] = R.color.colorAccent
             selectedCoins.add(listCoins[pos])
         }
     }

@@ -39,7 +39,7 @@ class ProfileActivity : AppCompatActivity() , OnCompleted {//This activity is th
         var gold: Float = 0.0f//amount of gold in the bank
         lateinit var wallet: Wallet//local wallet
         lateinit var nastycoins: ArrayList<NastyCoin>//coins from the map that have not been collected yet
-        var coinExchangeRates: ArrayList<CoinExchangeRates>? = null//exchange rates this week
+        var coinExchangeRates: ArrayList<CoinExchangeRates> = ArrayList()//exchange rates this week
 
         //exclusively for test purposes
         @SuppressLint("StaticFieldLeak")
@@ -99,7 +99,6 @@ class ProfileActivity : AppCompatActivity() , OnCompleted {//This activity is th
             setUpTestEnvironment()
             setUpFragments()
         } else {
-            setUpFragments()
             getLocalAndWebData()//download exchange rates and new map
         }
 
@@ -183,62 +182,62 @@ class ProfileActivity : AppCompatActivity() , OnCompleted {//This activity is th
     }
 
     private fun saveProgress() {//saves progress to firestore
-        val gson = Gson()
-        val sharedprefsEditor = getSharedPreferences("General", Context.MODE_PRIVATE).edit()
-        sharedprefsEditor.putString("ER", gson.toJson(coinExchangeRates))
-        sharedprefsEditor.apply()
+        if(!isTest) {
+            val gson = Gson()
+            val sharedprefsEditor = getSharedPreferences("General", Context.MODE_PRIVATE).edit()
+            sharedprefsEditor.putString("ER", gson.toJson(coinExchangeRates))
+            sharedprefsEditor.apply()
 
-        //firestore automatically retries to update if connection is bad, otherwise automatically stored in cache
-        val db = FirebaseFirestore.getInstance().collection("users").document(user)
-        db.update("lD", downloadDate)
-                .addOnFailureListener { e ->
-                    Log.e("ProfileActivity", "Failed saving downloadDate", e)
-                }
-        db.update("exchangeCount", exchangedCount)
-                .addOnFailureListener { e ->
-                    Log.e("ProfileActivity", "Failed saving exchangeCount", e)
-                }
-        db.update("gold", gold)
-                .addOnFailureListener { e ->
-                    Log.e("ProfileActivity", "Failed saving gold", e)
-                }
-        db.update("wallet", gson.toJson(wallet))
-                .addOnFailureListener { e ->
-                    Log.e("ProfileActivity", "Failed saving wallet", e)
-                }
-        db.update("nastycoins", gson.toJson(nastycoins))
-                .addOnFailureListener { e ->
-                    Log.e("ProfileActivity", "Failed saving nastycoins", e)
-                }
-        db.update("movingSac", SubFragmentEvents.eventAvailability)
-                .addOnFailureListener { e ->
-                    Log.e("ProfileActivity", "Failed saving movingSac", e)
-                }
+            //firestore automatically retries to update if connection is bad, otherwise automatically stored in cache
+            val db = FirebaseFirestore.getInstance().collection("users").document(user)
+            db.update("lD", downloadDate)
+                    .addOnFailureListener { e ->
+                        Log.e("ProfileActivity", "Failed saving downloadDate", e)
+                    }
+            db.update("exchangeCount", exchangedCount)
+                    .addOnFailureListener { e ->
+                        Log.e("ProfileActivity", "Failed saving exchangeCount", e)
+                    }
+            db.update("gold", gold)
+                    .addOnFailureListener { e ->
+                        Log.e("ProfileActivity", "Failed saving gold", e)
+                    }
+            db.update("wallet", gson.toJson(wallet))
+                    .addOnFailureListener { e ->
+                        Log.e("ProfileActivity", "Failed saving wallet", e)
+                    }
+            db.update("nastycoins", gson.toJson(nastycoins))
+                    .addOnFailureListener { e ->
+                        Log.e("ProfileActivity", "Failed saving nastycoins", e)
+                    }
+            db.update("movingSac", SubFragmentEvents.eventAvailability)
+                    .addOnFailureListener { e ->
+                        Log.e("ProfileActivity", "Failed saving movingSac", e)
+                    }
+        }
     }
 
     override fun onTaskCompleted() {
+        downloadDate = getCurrentDate()
         fragmentMap?.addMarkers()
         fragmentMap?.drawPolygon()
     }
 
     private fun getLocalAndWebData() {//retrieve data on event availability, exchange rates and map
         val gson = Gson()
-        coinExchangeRates = gson.fromJson<ArrayList<CoinExchangeRates>>(getSharedPreferences("General", Context.MODE_PRIVATE).getString("ER", ""), object : TypeToken<ArrayList<CoinExchangeRates>>() {}.type)
         if (downloadDate != getCurrentDate()) {
-            downloadDate = getCurrentDate()
-            DownloadFileTask(this).execute("http://homepages.inf.ed.ac.uk/stg/coinz/$downloadDate/coinzmap.geojson")
+            setUpFragments()
+            DownloadFileTask(this).execute("http://homepages.inf.ed.ac.uk/stg/coinz/${getCurrentDate()}/coinzmap.geojson")
             SubFragmentEvents.eventAvailability = true
             exchangedCount = 0
         }else{
+            val c = gson.fromJson<ArrayList<CoinExchangeRates>>(getSharedPreferences("General", Context.MODE_PRIVATE).getString("ER", ""), object : TypeToken<ArrayList<CoinExchangeRates>>() {}.type)
+            if (c != null){
+                coinExchangeRates = c
+            }
+            setUpFragments()
             fragmentMap?.addMarkers()
             fragmentMap?.drawPolygon()
-        }
-        if (coinExchangeRates != null) {//check if today's exchange rates are correct
-            if (SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(coinExchangeRates!![0].date.time).toString() != getCurrentDate()) {
-                DownloadFileTask(this).execute("http://homepages.inf.ed.ac.uk/stg/coinz/$downloadDate/coinzmap.geojson")
-            }
-        } else {
-            DownloadFileTask(this).execute("http://homepages.inf.ed.ac.uk/stg/coinz/$downloadDate/coinzmap.geojson")
         }
     }
 
@@ -249,7 +248,6 @@ class ProfileActivity : AppCompatActivity() , OnCompleted {//This activity is th
         wallet = Wallet(arrayListOf(genCoin(0, 5.6)), arrayListOf(genCoin(1, 2.1)), arrayListOf(genCoin(2, 7.8)), arrayListOf(genCoin(3, 1.9)))
         downloadDate = "2018/11/24"
         DownloadFileTask(this).execute("http://homepages.inf.ed.ac.uk/stg/coinz/2018/11/24/coinzmap.geojson")
-        SubFragmentEvents.eventAvailability = true
         exchangedCount = 0
     }
 

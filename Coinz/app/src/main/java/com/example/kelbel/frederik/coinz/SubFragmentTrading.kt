@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 
 class SubFragmentTrading : Fragment(), View.OnClickListener {
     //start activities to browse and make offers here
@@ -31,11 +32,21 @@ class SubFragmentTrading : Fragment(), View.OnClickListener {
     override fun onClick(p0: View?) {//start respective activities on imageview click
         when (p0?.id) {
             R.id.browse_offers_img -> {
-                val i = Intent(this.context, BrowseOffers::class.java)
-                i.putExtra("filter", filterby.text.toString().trim())
-                startActivity(i)
+                if(ProfileActivity.coinExchangeRates.size > 0) {
+                    val i = Intent(this.context, BrowseOffers::class.java)
+                    i.putExtra("filter", filterby.text.toString().trim())
+                    startActivity(i)
+                }else{
+                    Toast.makeText(this.context, "Check connection and try again later!", Toast.LENGTH_SHORT).show()
+                }
             }
-            R.id.make_an_offer -> startActivity(Intent(this.context, MakeanOffer::class.java))
+            R.id.make_an_offer -> {
+                if(ProfileActivity.coinExchangeRates.size > 0) {
+                    startActivity(Intent(this.context, MakeanOffer::class.java))
+                }else{
+                    Toast.makeText(this.context, "Check connection and try again later!", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 }

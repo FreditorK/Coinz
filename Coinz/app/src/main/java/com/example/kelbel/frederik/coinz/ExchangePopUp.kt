@@ -25,7 +25,7 @@ class ExchangePopUp : AppCompatActivity(), AdapterView.OnItemClickListener {//ac
                 for(i in ProfileActivity.wallet.shilCoins){
                     val hm = HashMap<String, String>()
                     hm["listview_title"] = i.id
-                    hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates!![0].SHIL).toString()
+                    hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates[0].SHIL).toString()
                     hm["listview_image"] = getFittingIconId(i).toString()
                     aList.add(hm)
                 }
@@ -34,7 +34,7 @@ class ExchangePopUp : AppCompatActivity(), AdapterView.OnItemClickListener {//ac
                 for(i in ProfileActivity.wallet.dolrCoins){
                     val hm = HashMap<String, String>()
                     hm["listview_title"] = i.id
-                    hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates!![0].DOLR).toString()
+                    hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates[0].DOLR).toString()
                     hm["listview_image"] = getFittingIconId(i).toString()
                     aList.add(hm)
                 }
@@ -43,7 +43,7 @@ class ExchangePopUp : AppCompatActivity(), AdapterView.OnItemClickListener {//ac
                 for(i in ProfileActivity.wallet.quidCoins){
                     val hm = HashMap<String, String>()
                     hm["listview_title"] =  i.id
-                    hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates!![0].QUID).toString()
+                    hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates[0].QUID).toString()
                     hm["listview_image"] = getFittingIconId(i).toString()
                     aList.add(hm)
                 }
@@ -52,7 +52,7 @@ class ExchangePopUp : AppCompatActivity(), AdapterView.OnItemClickListener {//ac
                 for(i in ProfileActivity.wallet.penyCoins){
                     val hm = HashMap<String, String>()
                     hm["listview_title"] = i.id
-                    hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates!![0].PENY).toString()
+                    hm["listview_discription"] = "Value: " + i.value.toString() + ", Gold: " + (i.value * ProfileActivity.coinExchangeRates[0].PENY).toString()
                     hm["listview_image"] = getFittingIconId(i).toString()
                     aList.add(hm)
                 }
@@ -64,7 +64,7 @@ class ExchangePopUp : AppCompatActivity(), AdapterView.OnItemClickListener {//ac
         val androidListView = findViewById<ListView>(R.id.list_view)
         androidListView.adapter = simpleAdapter//set adapter for listview
         androidListView.onItemClickListener = this
-        if(aList.size == 0){//display message if no coins are in the lsit
+        if(aList.size == 0){//display message if no coins are in the list
             setContentView(R.layout.exchange_cover_up)
         }
         broketext = findViewById(R.id.broke_text)
@@ -89,7 +89,7 @@ class ExchangePopUp : AppCompatActivity(), AdapterView.OnItemClickListener {//ac
             "shil" -> {
                 bool = ProfileActivity.wallet.shilCoins[p2].id.matches(Regex(".*TRADED"))//traded coins can always get exchanged
                 if (ProfileActivity.exchangedCount < 25 || bool) {
-                    ProfileActivity.gold += ProfileActivity.wallet.shilCoins[p2].value * ProfileActivity.coinExchangeRates!![0].SHIL
+                    ProfileActivity.gold += ProfileActivity.wallet.shilCoins[p2].value * ProfileActivity.coinExchangeRates[0].SHIL
                     ProfileActivity.wallet.shilCoins.removeAt(p2)
                     aList.removeAt(p2)
                     p0?.removeViewInLayout(p1)
@@ -101,7 +101,7 @@ class ExchangePopUp : AppCompatActivity(), AdapterView.OnItemClickListener {//ac
             "dolr" -> {
                 bool = ProfileActivity.wallet.dolrCoins[p2].id.matches(Regex(".*TRADED"))//traded coins can always get exchanged
                 if (ProfileActivity.exchangedCount < 25 || bool) {//check if 25 coins have been exchanged already
-                    ProfileActivity.gold += ProfileActivity.wallet.dolrCoins[p2].value * ProfileActivity.coinExchangeRates!![0].DOLR
+                    ProfileActivity.gold += ProfileActivity.wallet.dolrCoins[p2].value * ProfileActivity.coinExchangeRates[0].DOLR
                     ProfileActivity.wallet.dolrCoins.removeAt(p2)
                     aList.removeAt(p2)
                     p0?.removeViewInLayout(p1)
@@ -113,7 +113,7 @@ class ExchangePopUp : AppCompatActivity(), AdapterView.OnItemClickListener {//ac
             "quid" -> {
                 bool = ProfileActivity.wallet.quidCoins[p2].id.matches(Regex(".*TRADED"))//traded coins can always get exchanged
                 if (ProfileActivity.exchangedCount < 25 || bool) {//check if 25 coins have been exchanged already
-                    ProfileActivity.gold += ProfileActivity.wallet.quidCoins[p2].value * ProfileActivity.coinExchangeRates!![0].QUID
+                    ProfileActivity.gold += ProfileActivity.wallet.quidCoins[p2].value * ProfileActivity.coinExchangeRates[0].QUID
                     ProfileActivity.wallet.quidCoins.removeAt(p2)
                     aList.removeAt(p2)
                     p0?.removeViewInLayout(p1)
@@ -125,7 +125,7 @@ class ExchangePopUp : AppCompatActivity(), AdapterView.OnItemClickListener {//ac
             "peny" -> {
                 bool = ProfileActivity.wallet.penyCoins[p2].id.matches(Regex(".*TRADED"))//traded coins can always get exchanged
                 if (ProfileActivity.exchangedCount < 25 || bool) {//check if 25 coins have been exchanged already
-                    ProfileActivity.gold += ProfileActivity.wallet.penyCoins[p2].value * ProfileActivity.coinExchangeRates!![0].PENY
+                    ProfileActivity.gold += ProfileActivity.wallet.penyCoins[p2].value * ProfileActivity.coinExchangeRates[0].PENY
                     ProfileActivity.wallet.penyCoins.removeAt(p2)
                     aList.removeAt(p2)
                     p0?.removeViewInLayout(p1)

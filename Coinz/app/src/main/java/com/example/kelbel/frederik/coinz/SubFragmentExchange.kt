@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class SubFragmentExchange : Fragment(), View.OnClickListener {
+class SubFragmentExchange : Fragment(), View.OnClickListener, OnCompleted2 {
 
     //displays today's values of coins
     private lateinit var shilText: TextView
@@ -28,52 +28,54 @@ class SubFragmentExchange : Fragment(), View.OnClickListener {
     private lateinit var quidButton: Button
     private lateinit var penyButton: Button
 
-    companion object {
+    //plots this weeks exchange rates
+    private var shilChart: ChartView? = null
+    private var dolrChart: ChartView? = null
+    private var quidChart: ChartView? = null
+    private var penyChart: ChartView? = null
 
-        //plots this weeks exchange rates
-        private lateinit var shilChart: ChartView
-        private lateinit var dolrChart: ChartView
-        private lateinit var quidChart: ChartView
-        private lateinit var penyChart: ChartView
+    override fun onTask2Completed() {
+        setUpTextFields()
+        initGraphs()
+    }
 
-        fun initGraphs() {//initialises today's plots
-            shilChart.reset()
-            dolrChart.reset()
-            quidChart.reset()
-            penyChart.reset()
+    private fun initGraphs() {//initialises today's plots
+            shilChart!!.reset()
+            dolrChart!!.reset()
+            quidChart!!.reset()
+            penyChart!!.reset()
             val labels = arrayOf<String>(//date labels
-                    SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time - 518400000L)),
-                    SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time - 432000000L)),
-                    SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time - 345600000L)),
-                    SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time - 259200000L)),
-                    SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time - 172800000L)),
-                    SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time - 86400000L)),
-                    SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates!![0].date.time))
+                    SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates[0].date.time - 518400000L)),
+                    SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates[0].date.time - 432000000L)),
+                    SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates[0].date.time - 345600000L)),
+                    SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates[0].date.time - 259200000L)),
+                    SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates[0].date.time - 172800000L)),
+                    SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates[0].date.time - 86400000L)),
+                    SimpleDateFormat("dd/MM", Locale.ENGLISH).format(Date(ProfileActivity.coinExchangeRates[0].date.time))
             )
             val valuesshil = FloatArray(7)
             val valuesdolr = FloatArray(7)
             val valuesquid = FloatArray(7)
             val valuespeny = FloatArray(7)
             for (i in 0..6) {//fills arrays with this weeks exchange rates, oldest rate first
-                valuesshil[i] = ProfileActivity.coinExchangeRates!![6 - i].SHIL
-                valuesdolr[i] = ProfileActivity.coinExchangeRates!![6 - i].DOLR
-                valuesquid[i] = ProfileActivity.coinExchangeRates!![6 - i].QUID
-                valuespeny[i] = ProfileActivity.coinExchangeRates!![6 - i].PENY
+                valuesshil[i] = ProfileActivity.coinExchangeRates[6 - i].SHIL
+                valuesdolr[i] = ProfileActivity.coinExchangeRates[6 - i].DOLR
+                valuesquid[i] = ProfileActivity.coinExchangeRates[6 - i].QUID
+                valuespeny[i] = ProfileActivity.coinExchangeRates[6 - i].PENY
             }
             //plots graphs
             val line1 = LineSet(labels, valuesshil)
             val line2 = LineSet(labels, valuesdolr)
             val line3 = LineSet(labels, valuesquid)
             val line4 = LineSet(labels, valuespeny)
-            shilChart.addData(line1)
-            dolrChart.addData(line2)
-            quidChart.addData(line3)
-            penyChart.addData(line4)
-            shilChart.show()
-            dolrChart.show()
-            quidChart.show()
-            penyChart.show()
-        }
+            shilChart!!.addData(line1)
+            dolrChart!!.addData(line2)
+            quidChart!!.addData(line3)
+            penyChart!!.addData(line4)
+            shilChart!!.show()
+            dolrChart!!.show()
+            quidChart!!.show()
+            penyChart!!.show()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -100,26 +102,45 @@ class SubFragmentExchange : Fragment(), View.OnClickListener {
         quidChart = view.findViewById(R.id.quid_graph)
         penyChart = view.findViewById(R.id.peny_graph)
 
-        if (ProfileActivity.coinExchangeRates != null) {
-            if (ProfileActivity.coinExchangeRates!!.size == 7) {//only show graphs if all exchange rates were retrieved
-                initGraphs()
+        setUpTextFields()//show today's coin values
+        if(ProfileActivity.isTest){//in case of test
+            downloadRates(SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).parse("2018/11/24"))
+        }else {
+            if (ProfileActivity.coinExchangeRates.size < 7 || ProfileActivity.coinExchangeRates[0].date != getCurrentDate()) {//incomplete set of rates
+                downloadRates(getCurrentDate())
+            } else {
+                onTask2Completed()
             }
         }
+    }
 
-        setUpTextFields()//show today's coin values
+    private fun getCurrentDate(): Date {//gets current date
+        return Calendar.getInstance().time
+    }
+
+    private fun downloadRates(d : Date) {
+        //call additional async task for graphs in exchange tab
+        DownloadExchangeRates(this, d).execute(
+                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(d) + "/coinzmap.geojson",
+                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(d.time - 86400000L)) + "/coinzmap.geojson",
+                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(d.time - 172800000L)) + "/coinzmap.geojson",
+                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(d.time - 259200000L)) + "/coinzmap.geojson",
+                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(d.time - 345600000L)) + "/coinzmap.geojson",
+                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(d.time - 432000000L)) + "/coinzmap.geojson",
+                "http://homepages.inf.ed.ac.uk/stg/coinz/" + SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(d.time - 518400000L)) + "/coinzmap.geojson")
     }
 
     private fun setUpTextFields() {//show today's coin values
-        if (ProfileActivity.coinExchangeRates != null) {
-            val s1 = "SHIL: " + ProfileActivity.coinExchangeRates!![0].SHIL.toString()
-            val s2 = "DOLR: " + ProfileActivity.coinExchangeRates!![0].DOLR.toString()
-            val s3 = "QUID: " + ProfileActivity.coinExchangeRates!![0].QUID.toString()
-            val s4 = "PENY: " + ProfileActivity.coinExchangeRates!![0].PENY.toString()
-            shilText.text = s1
-            dolrText.text = s2
-            quidText.text = s3
-            penyText.text = s4
-        } else {
+            if (ProfileActivity.coinExchangeRates.size > 0) {
+                val s1 = "SHIL: " + ProfileActivity.coinExchangeRates[0].SHIL.toString()
+                val s2 = "DOLR: " + ProfileActivity.coinExchangeRates[0].DOLR.toString()
+                val s3 = "QUID: " + ProfileActivity.coinExchangeRates[0].QUID.toString()
+                val s4 = "PENY: " + ProfileActivity.coinExchangeRates[0].PENY.toString()
+                shilText.text = s1
+                dolrText.text = s2
+                quidText.text = s3
+                penyText.text = s4
+            }else {
             val s5 = "Not retrievable"
             shilText.text = s5
             dolrText.text = s5
