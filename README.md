@@ -9,4 +9,5 @@ Before 19/10/2018 Design decisions were realised, plan outlayed
 25/11/2018 A couple of design changes, minor bug fixes, cleaning up code (commenting, reformating, removing warnings)
 27/11/2018 Tests were added, minor comment changes, bug fix where the bar plot in the account tab did not show, this is prospectively the version of the app that is going to be submitted unless bugs are uncovered
 30/11/2018 Bug fixed where gold was not received after trade, Bug fixed where "catch me if you can"-event led to crash on finish, Layout redesigned and layout bug fixes, Live updates on gold when your offer was accepted, fixed bugs concerning profile picture display
+05/12/2018 Minor bug fixes, retrieving exchange rates now happens via callback
 
