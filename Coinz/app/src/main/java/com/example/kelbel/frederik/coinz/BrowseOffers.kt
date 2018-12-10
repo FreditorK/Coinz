@@ -1,5 +1,6 @@
 package com.example.kelbel.frederik.coinz
 
+import android.app.ActionBar
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -7,6 +8,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.Layout
 import android.view.View
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import android.view.LayoutInflater
@@ -136,6 +138,8 @@ class BrowseOffers : AppCompatActivity() {//Browse to offers to exchange gold fo
                 .build()
         fRecyclerAdapter = object : FirestoreRecyclerAdapter<TradeOffer, TradeOfferHolder>(options) {
             override fun onBindViewHolder(holder: TradeOfferHolder, position: Int, offer: TradeOffer) {
+                holder.itemView.visibility = View.VISIBLE
+                holder.itemView.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
                 if (offerList.size > 0) {
                     if (offerList[position].user != user && (offerList[position].user?.substringBefore('@') == filter || bool)) {//filter by given username filter and exclude offers with own username
                         val o = offerList[position]

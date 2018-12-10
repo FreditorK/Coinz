@@ -256,8 +256,8 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
     //Coin collection
     private fun checkForCoin(location: Location) {//check if a coin can be collected and collect it
         lastLocation = location
-        val a = ProfileActivity.nastycoins.indexOfFirst { i -> compareCoordinates(Pair(location.longitude, location.latitude), i.coordinates) }
-        if (a > -1) {
+        val a = ProfileActivity.nastycoins.indexOfFirst { i -> compareCoordinates(location, i.coordinates) }
+        if (a > -1 && map?.polygons?.size == 25) {
             if (checkIfValidZone(ProfileActivity.nastycoins[a].coordinates)) {//check if coin is in zone of your team
                 ProfileActivity.collect(ProfileActivity.nastycoins[a])
                 ProfileActivity.nastycoins.removeAt(a)
@@ -269,8 +269,11 @@ class FragmentMap : Fragment(), LocationEngineListener, PermissionsListener {
         }
     }
 
-    private fun compareCoordinates(a: Pair<Double, Double>, b: Pair<Double, Double>): Boolean {//test if given location is in range
-        return a.first < b.first + 0.0002f && a.first > b.first - 0.0002f && a.second < b.second + 0.0002f && a.second > b.second - 0.0002f
+    private fun compareCoordinates(a: Location, b: Pair<Double, Double>): Boolean {//test if given location is in range
+        val loc = Location("")
+        loc.longitude = b.first
+        loc.latitude = b.second
+        return loc.distanceTo(a) < 25 // within 25m
     }
 
     private fun checkIfValidZone(b: Pair<Double, Double>): Boolean {//checks if coin is within one of your zones

@@ -184,12 +184,12 @@ class GatheringTest {
         val textView = onView(
                 allOf(withId(R.id.shil_textview),
                         isDisplayed()))
-        textView.check(matches(withText("2")))
+        textView.check(matches(withText("3")))
 
         val textView2 = onView(
                 allOf(withId(R.id.dolr_textview),
                         isDisplayed()))
-        textView2.check(matches(withText("2")))
+        textView2.check(matches(withText("4")))
 
         val textView3 = onView(
                 allOf(withId(R.id.quid_textview),

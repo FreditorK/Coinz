@@ -234,11 +234,6 @@ public class BrowseandAcceptTest {
 
         ViewInteraction textView = onView(
                 allOf(withId(R.id.current_gold), withText("99799.5"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.instanceOf(android.widget.LinearLayout.class),
-                                        1),
-                                1),
                         isDisplayed()));
         textView.check(matches(withText("99799.5")));
 
@@ -263,31 +258,16 @@ public class BrowseandAcceptTest {
 
         ViewInteraction textView2 = onView(
                 allOf(withId(R.id.gold_display), withText("99799.5"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.instanceOf(android.widget.LinearLayout.class),
-                                        0),
-                                1),
                         isDisplayed()));
         textView2.check(matches(withText("99799.5")));
 
         ViewInteraction textView3 = onView(
                 allOf(withId(R.id.wallet_dolr_text), withText("2"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.appbar_id),
-                                        0),
-                                3),
                         isDisplayed()));
         textView3.check(matches(withText("2")));
 
         ViewInteraction textView4 = onView(
                 allOf(withId(R.id.wallet_peny_text), withText("2"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.appbar_id),
-                                        0),
-                                7),
                         isDisplayed()));
         textView4.check(matches(withText("2")));
     }
