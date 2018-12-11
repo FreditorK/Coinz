@@ -11,3 +11,6 @@ Before 19/10/2018 Design decisions were realised, plan outlayed
 30/11/2018 Bug fixed where gold was not received after trade, Bug fixed where "catch me if you can"-event led to crash on finish, Layout redesigned and layout bug fixes, Live updates on gold when your offer was accepted, fixed bugs concerning profile picture display
 05/12/2018 Minor bug fixes, retrieving exchange rates now happens via callback
 10/12/2018 Fixed bug where Offers disappeared after scrolling in BrowseOffers, After rereading coursework specification set collection radius to 25m around user's location, minor layout fix
+
+
+IMPORTANT NOTE: Please grant your location permissions before opening the app for the first time. The app will only request location permissions for the next time you open the app. This is a simple measurement taken to avoid potential bugs following mid game permission changes.
